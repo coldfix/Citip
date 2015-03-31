@@ -51,7 +51,15 @@ LDFLAGS=-lm `pkg-config --libs gtk+-2.0`
 
 OBJS= make_D.o ITIP.o itip1.o Xitip.o
 
+all: Xitip Citip
+
 Xitip:	$(OBJS) qsopt.a
+
+Citip: make_D.o ITIP.o itip1.o Citip.o qsopt.a
+	g++ -o $@ $^
+
+Citip.o: Citip.cpp
+	g++ -std=c++11 -c $<
 
 clean:
 	rm -f ITIP.c itip.c $(OBJS)
