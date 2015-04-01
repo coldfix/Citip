@@ -4,12 +4,21 @@ Citip
 Information Theoretic Inequality Prover (C++/CLI version).
 
 This program is a fork of Xitip_ which is based on ITIP_ and depends on
-QSopt_.
+QSopt_. At this point, the only difference from Xitip is, that the GTK
+frontend was replaced by a simple CLI frontend.
 
-The only difference from Xitip (so far) is, that the GTK frontend was
-replaced by a simple CLI frontend. *Why?* I found the GUI inconvenient to
-work with and pointless for this particular application. CLI applications
-can be used for automated purposes much more easily.
+*Why fork?*
+
+- I found the GUI inconvenient to work with and pointless for this
+  particular application. CLI applications can be used for automated
+  purposes much more easily.
+- To provide a public platform for possible continued development of the
+  application. I was unable to get in contact with any of the original
+  authors of Xitip (emails are dead), and there is (AFAIK) no public VCS. I
+  probably won't do much on this repository on my own, but **if you have
+  any ideas and/or patches to contribute, don't be shy!** I probably won't
+  be able to answer any questions, but asking can't hurt. In any case, just
+  open an issue or send me a pull-request.
 
 .. _Xitip: http://xitip.epfl.ch/
 .. _ITIP: http://user-www.ie.cuhk.edu.hk/~ITIP/
