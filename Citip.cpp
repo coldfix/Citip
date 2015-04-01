@@ -167,7 +167,8 @@ Result callITIP (std::vector<std::string> expr)
     inplace_remove_if(expr, mem_fn(&string::empty));
 
     if (expr.empty()) {
-        return Result(Result::Error, "The information expression is EMPTY!\n You must enter a valid information expression in the first field.");
+        return Result(Result::Error,
+                "The information expression is EMPTY!\n You must enter a valid information expression in the first field.");
     }
 
     int num_expr = expr.size();
@@ -217,7 +218,7 @@ Result callITIP (std::vector<std::string> expr)
         return Result(Result::Error,
                 "Syntax ERROR: Constraint ", -result-2, " has wrong syntax.\n"
                " Please re-enter\n\t",
-               quoted(expr[-1*result-2]),
+               quoted(expr[-result-2]),
                "\n with the correct syntax");
     }
 
@@ -226,7 +227,7 @@ Result callITIP (std::vector<std::string> expr)
                 "ERROR: The number of distinct random variables cannot be more than 52.");
     }
 
-    if (result == 4){
+    if (result == 4) {
         return Result(Result::Error,
                 "ERROR: Some of the random variables are too long. The maximal length allowed for a single random variable name is 300.");
     }
