@@ -1,6 +1,12 @@
-#  Xitip -- Information theoretic inequality Prover. 
-#  Xitip.c is the main C program to produce the GTK 2+ based
-#  graphical front end.
+#  Citip -- Information Theoretic Inequality Prover (C++/CLI version)
+#
+#  Copyright (C) 2015 Thomas Gläßle <t_glaessle@gmx.de>
+#                     http://github.com/coldfix/Citip
+#
+#  This file is copied from the Xitip program and possibly modified. For a
+#  detailed list of changes from the original file, see the git version
+#  history.
+#
 #  Copyright (C) 2007 Rethnakaran Pulikkoonattu,
 #                     Etienne Perron, 
 #                     Suhas Diggavi. 
@@ -33,7 +39,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # 
 #-----------------------Makefile-----------------------
-# Just type make to produce the Xitip executable. The following packages 
+# Just type make to produce the Citip executable. The following packages 
 # are required for successfully compilation.
 # Gtk2+, (and all libs)
 # lex/flex
@@ -45,17 +51,15 @@
 
 
 CC=gcc
-CFLAGS= `pkg-config --cflags gtk+-2.0`
-LDFLAGS=-lm `pkg-config --libs gtk+-2.0`
+CFLAGS=
+LDFLAGS=
 
 
-OBJS= make_D.o ITIP.o itip1.o Xitip.o
+OBJS= make_D.o ITIP.o itip1.o Citip.o
 
-all: Xitip Citip
+all: Citip
 
-Xitip:	$(OBJS) qsopt.a
-
-Citip: make_D.o ITIP.o itip1.o Citip.o qsopt.a
+Citip: $(OBJS) qsopt.a
 	g++ -o $@ $^
 
 Citip.o: Citip.cpp
@@ -65,4 +69,4 @@ clean:
 	rm -f ITIP.c itip.c $(OBJS)
 
 clobber: clean
-	rm -f Xitip
+	rm -f Citip

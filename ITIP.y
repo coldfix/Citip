@@ -1,9 +1,15 @@
 %{
 
- /* 
- *  Xitip -- Information theoretic inequality Prover. 
- *  Xitip.c is the main C program to produce the GTK 2+ based
- *  graphical front end.
+/*
+ *  Citip -- Information Theoretic Inequality Prover (C++/CLI version)
+ *
+ *  Copyright (C) 2015 Thomas Gläßle <t_glaessle@gmx.de>
+ *                     http://github.com/coldfix/Citip
+ *
+ *  This file is copied from the Xitip program and possibly modified. For a
+ *  detailed list of changes from the original file, see the git version
+ *  history.
+ *
  *  Copyright (C) 2007 Rethnakaran Pulikkoonattu,
  *                     Etienne Perron, 
  *                     Suhas Diggavi. 
