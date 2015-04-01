@@ -202,7 +202,11 @@ Result callITIP (std::vector<std::string> expr)
     }
 
     if (result == -1) {
-        return Result(Result::True,
+        // TODO: For the sake of automation, it should be easy to output a
+        // Result::Success in many cases here. Unfortunately, the exit code
+        // of itip1 is ambiguous and doesn't allow to distinguish between
+        // "H(X)>=0" and "H(X)<=0".
+        return Result(Result::Unknown,
                 "You have entered a basic Shannon measure. These measures, without sign are always non negative! Basic Information measures are in the form of entropies (single, joint or conditional) and mutual information(unconditional or conditional). For example the following are basic shannon measures (for 3 random variables X,Y and Z) which are non-nagative by definition\nH(X)>=0, \nH(X,Y)>=0, \nI(X;Y)>=0, \nI(X;Y|Z)>=0,\nH(X|Y)>=0. \nIf you have entered an expression as a single negative constant times these basic Shannon measure, then the inequality is always Non true, beacuase of the non negativity of Shannon measures");
     }
 
