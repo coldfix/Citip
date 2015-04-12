@@ -945,21 +945,6 @@ int ITIP(char **expressions, int number_expressions){
     glp_set_mat_row(lp, row, row_length, row_indices-1, row_values-1);
   }
 
-  /* Ratna:the number of random variables must not be 1:
-     If it is one, then it is just a single Shannon information measure
-     like the following
-     Entropy H()
-     Conditional entropy H(.|.)
-     Joint entropy H(.,.)
-     Mutual information I(.;.)
-     Conditional mutual information I(.;.|.)
-     etc
-     These are anyway non-negative. Exit with an ID and display an appropriate 
-     message for this special case.*/
-  if(rvtotal == 1){
-    return -1;
-  }
-
   /*add all the Shannon-type constraints:*/
   make_D(lp,rvtotal);
 

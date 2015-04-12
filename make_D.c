@@ -89,6 +89,17 @@ void make_D(glp_prob* lp, int number_vars) /*number_constraints indicates the nu
 	double *values;
     int row;
 	
+    int ind_tmp;
+    double val_tmp;
+
+    if (number_vars == 1) {
+      ind_tmp = 1;
+      val_tmp = 1;
+      row = glp_add_rows(lp, 1);
+      glp_set_row_bnds(lp, row, GLP_LO, 0.0, NAN);
+      glp_set_mat_row(lp, row, 1, (&ind_tmp)-1, (&val_tmp)-1);
+      return;
+    }
 
 	number_rows = glp_get_num_rows(lp);
 	number_cols = glp_get_num_cols(lp);
