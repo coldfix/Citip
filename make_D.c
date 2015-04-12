@@ -22,7 +22,7 @@
  *  Dependent utilities:
  *  The program uses two other softwares
  *  1) The ITIP software developed by Raymond Yeung 
- *  2) qsopt, a linear programming solver developed by David Applegate et al.
+ *  2) The GLPK (GNU Linear Programming Kit) for linear programming
  *  The details of the licensing terms of the above mentioned software shall 
  *  be obtained from the respective websites and owners. 
  *
@@ -61,8 +61,8 @@
  * Etienne Perron and can be used and changed freely. Please
  * do not remove this comment. For questions write to
  * etienne.perron@epfl.ch.
- * For solving the linear programs, we use the QSopt callable library,
- * available at http://www2.isye.gatech.edu/~wcook/qsopt/
+ * For solving the linear programs, we use the GLPK callable library,
+ * available at https://www.gnu.org/software/glpk/
  */
 
 /*
@@ -78,19 +78,20 @@ D >= 0 AND Q >= 0
 
 #include <math.h>
 #include <stdlib.h>
-#include "qsopt.h"
+#include <glpk.h>
 
-void make_D(QSprob lp, int number_vars) /*number_constraints indicates the number of rows already present in the linear program*/
+void make_D(glp_prob* lp, int number_vars) /*number_constraints indicates the number of rows already present in the linear program*/
 {
 	long int index,i,j,s1,s2,mask,temp ;
 	int number_rows;
 	int number_cols;
 	int *indices;
 	double *values;
+    int row;
 	
 
-	number_rows = QSget_rowcount(lp);
-	number_cols = QSget_colcount(lp);
+	number_rows = glp_get_num_rows(lp);
+	number_cols = glp_get_num_cols(lp);
 
 
 	/*indices and values are buffers used to feed the current row into the LPX object:*/
@@ -102,15 +103,17 @@ void make_D(QSprob lp, int number_vars) /*number_constraints indicates the numbe
 	{
 	  s1 = (1L << (index - 1)) ; /*s1 is 2^(index-1)*/
 
-	  indices[0] = number_cols-1; /* H(X1,...,XN)*/ /*in QSopt, matrix-indices start at 0*/
+	  indices[0] = number_cols; /* H(X1,...,XN)*/ /*in GLPK, matrix-indices start at 1*/
 	  values[0] = -1;
-	  indices[1] = number_cols - s1 -1; /* H( {X1,...,XN} minus {k} ) */
+	  indices[1] = number_cols - s1; /* H( {X1,...,XN} minus {k} ) */
 	  values[1] = 1;
 	  
 	  number_rows++;
 
 	  /*add new row to the LP:*/
-	  QSadd_row(lp, 2, indices, values, 0, 'L', NULL);
+      row = glp_add_rows(lp, 1);
+      glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
+      glp_set_mat_row(lp, row, 2, indices-1, values-1);
 	}
 
 
@@ -124,41 +127,45 @@ void make_D(QSprob lp, int number_vars) /*number_constraints indicates the numbe
 	    mask = s1 | s2 ; /*this is the index of (X_(i+1),X_(j+1))*/
 
 	    /*first row ( for K = {} ):*/
-	    indices[0] = s1-1; /*H(X_(i+1))*/
+	    indices[0] = s1; /*H(X_(i+1))*/
 	    values[0] = -1;
 
-	    indices[1] = s2-1; /*H(X_(j+1))*/
+	    indices[1] = s2; /*H(X_(j+1))*/
 	    values[1] = -1;
 
-	    indices[2] = mask-1; /* H(X_(i+1),X_(j+1)) */
+	    indices[2] = mask; /* H(X_(i+1),X_(j+1)) */
 	    values[2] = 1;
 
 	    number_rows++;
 
 	    /*add new row to the LP*/
-	    QSadd_row(lp, 3, indices, values, 0, 'L', NULL);
+        row = glp_add_rows(lp, 1);
+        glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
+        glp_set_mat_row(lp, row, 3, indices-1, values-1);
 
 
 
 	    /*additional rows for all non-empty K:*/
 	    for(temp=1;temp<=number_cols;temp++) { /* temp runs through all possible subsets of (X_1, ..., X_N)*/
 	      if(!(temp & mask)) { /*if K != (i+1,j+1)*/
-		indices[0] = (s1 | temp) - 1; /* H(X_(i+1), X_K) */
+		indices[0] = (s1 | temp); /* H(X_(i+1), X_K) */
 		values[0] = -1;
 		
-		indices[1] = (s2 | temp) - 1; /* H(X_(j+1), X_K) */
+		indices[1] = (s2 | temp); /* H(X_(j+1), X_K) */
 		values[1] = -1;
 		
-		indices[2] = temp-1; /* H(X_K) */
+		indices[2] = temp; /* H(X_K) */
 		values[2] = 1;
 		
-		indices[3] = (s1 | s2 | temp) -1; /* H(X_(i+1), X_(j+1), X_K) */
+		indices[3] = (s1 | s2 | temp); /* H(X_(i+1), X_(j+1), X_K) */
 		values[3] = 1;
 
 		number_rows++;
 
 		/*add new row to the LP*/
-		QSadd_row(lp, 4, indices, values, 0, 'L', NULL);
+        row = glp_add_rows(lp, 1);
+        glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
+        glp_set_mat_row(lp, row, 4, indices-1, values-1);
 	      }
 	    }
 	  }

@@ -21,7 +21,7 @@
 #  Dependent utilities:
 #  The program uses two other softwares
 #  1) The ITIP software developed by Raymond Yeung 
-#  2) qsopt, a linear programming solver developed by David Applegate et al.
+#  2) The GLPK (GNU Linear Programming Kit) for linear programming
 #  The details of the licensing terms of the above mentioned software shall 
 #  be obtained from the respective websites and owners. 
 #
@@ -46,7 +46,7 @@
 # yacc/bison
 # gcc (or cc)
 # pango, glib, xpm and related libs
-# qsopt (if not included, obtain the library from qsopt webpage)
+# GLPK (if not included, obtain the library from GLPK webpage)
 #
 
 
@@ -59,8 +59,8 @@ OBJS= make_D.o ITIP.o itip1.o Citip.o
 
 all: Citip
 
-Citip: $(OBJS) qsopt.a
-	g++ -o $@ $^
+Citip: $(OBJS)
+	g++ -o $@ $^ -lglpk
 
 Citip.o: Citip.cpp
 	g++ -std=c++11 -c $<

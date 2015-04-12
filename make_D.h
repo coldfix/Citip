@@ -22,7 +22,7 @@
  *  Dependent utilities:
  *  The program uses two other softwares
  *  1) The ITIP software developed by Raymond Yeung 
- *  2) qsopt, a linear programming solver developed by David Applegate et al.
+ *  2) The GLPK (GNU Linear Programming Kit) for linear programming
  *  The details of the licensing terms of the above mentioned software shall 
  *  be obtained from the respective websites and owners. 
  *
@@ -47,7 +47,7 @@
  * Etienne Perron and can be used and changed freely. Please
  * do not remove this comment. For questions write to
  * etienne.perron@epfl.ch.
- * For solving the linear programs, we use the QSopt callable library,
- * available at http://www2.isye.gatech.edu/~wcook/qsopt/
+ * For solving the linear programs, we use the GLPK callable library,
+ * available at https://www.gnu.org/software/glpk/
  */
-void make_D(QSprob lp, int number_vars);
+void make_D(glp_prob* lp, int number_vars);
