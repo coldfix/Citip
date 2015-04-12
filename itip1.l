@@ -24,7 +24,7 @@
  *  Dependent utilities:
  *  The program Xitip uses two other softwares
  *  1) The ITIP software developed by Raymond Yeung 
- *  2) qsopt, a linear programming solver developed by David Applegate et al.
+ *  2) The GLPK (GNU Linear Programming Kit) for linear programming
  *  The details of the licensing terms of the above mentioned software shall 
  *  be obtained from the respective websites and owners. 
  *
