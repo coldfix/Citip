@@ -1,4 +1,4 @@
-/* 
+/*
  *  Citip -- Information Theoretic Inequality Prover (C++/CLI version)
  *
  *  Copyright (C) 2015 Thomas Gläßle <t_glaessle@gmx.de>
@@ -8,12 +8,12 @@
  *  detailed list of changes from the original file, see the git version
  *  history.
  *
- *  itip1.l is the preparser lex file. lex/flex is required 
+ *  itip1.l is the preparser lex file. lex/flex is required
  *  to compile this
  *  Copyright (C) 2007 Rethnakaran Pulikkoonattu,
- *                     Etienne Perron, 
- *                     Suhas Diggavi. 
- *                     Information Processing Group, 
+ *                     Etienne Perron,
+ *                     Suhas Diggavi.
+ *                     Information Processing Group,
  *                     Ecole Polytechnique Federale de Lausanne,
  *                     EPFL, Switzerland, CH-1005
  *                     Email: rethnakaran.pulikkoonattu@epfl.ch
@@ -23,24 +23,24 @@
  *                     http://xitip.epfl.ch
  *  Dependent utilities:
  *  The program Xitip uses two other softwares
- *  1) The ITIP software developed by Raymond Yeung 
+ *  1) The ITIP software developed by Raymond Yeung
  *  2) The GLPK (GNU Linear Programming Kit) for linear programming
- *  The details of the licensing terms of the above mentioned software shall 
- *  be obtained from the respective websites and owners. 
+ *  The details of the licensing terms of the above mentioned software shall
+ *  be obtained from the respective websites and owners.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 
@@ -80,7 +80,7 @@ struct doc_words *getmem()
        }
 
 int FindWords(char *text){
-/* return the index of the text in the list if text is already present 
+/* return the index of the text in the list if text is already present
    in the dictionary. Otherwise, return -1.
 */
     struct doc_words *Dictionary;
@@ -88,19 +88,19 @@ int FindWords(char *text){
     int iIndex=0;
     Dictionary=head; //Take the updated dictionary and call it "Dictionary "
 while ((Dictionary != NULL) && !found) { //If non empty and if no match found yet
-		if (!strcmp(Dictionary->words, text)) { //If a match is found 
-			found = 1;       // Flag that a match has been found in the dictionary
+        if (!strcmp(Dictionary->words, text)) { //If a match is found
+            found = 1;       // Flag that a match has been found in the dictionary
                         iIndex=Dictionary->index;// Index of the matching word in dictionary
-		} 
+        }
                 else {                                 // If no match found yet, try next element
-			Dictionary = Dictionary->next; /*If no match found, get ready 
-                                                         to point to the next element 
+            Dictionary = Dictionary->next; /*If no match found, get ready
+                                                         to point to the next element
                                                          in the dictionary list */
                         //found=0;
-		}
+        }
 
-	}
-if (found==1){ //When a word is found matching in the dictionary,return the index 
+    }
+if (found==1){ //When a word is found matching in the dictionary,return the index
     return iIndex;
 }
 else {
@@ -108,7 +108,7 @@ else {
 }
 }
 
-int AddWords( char *text) 
+int AddWords( char *text)
 {
 struct doc_words* newNode;
 
@@ -149,28 +149,28 @@ int destroy_doc_words(){
     word_error = 4; /* this will cause itip() to quit without calling ITIP */
   }
   else{
-    /*check whether the yytext is in the table, if yes, find position 
+    /*check whether the yytext is in the table, if yes, find position
       in table, output corresponding letter (A,B,...); if not
       insert into table, output corr. letter.
      */
     if(head == NULL) {
-       i=-1;            /*First word; Very first word is read 
+       i=-1;            /*First word; Very first word is read
                            and add to the dictionary*/
     }
     else{
-      i = FindWords(yytext);  /*Pass the index of the matched word in 
+      i = FindWords(yytext);  /*Pass the index of the matched word in
                           the dictionary*/
     }
     if(i == -1){
-     i = AddWords(yytext);   /* Add the words which are not yet present 
-                           in Dictionary (indicated by i=-1) to 
+     i = AddWords(yytext);   /* Add the words which are not yet present
+                           in Dictionary (indicated by i=-1) to
                            Dictionary */
     }
 
     //  If the number of distinct words (random variables) are more than
-    //  26, then use small letter (English alphabet) to map the random 
+    //  26, then use small letter (English alphabet) to map the random
     //  variables, while parsing. For the first 26 distinct random variables
-    //  the parser maps out them to distinct letters of the English 
+    //  the parser maps out them to distinct letters of the English
     //  (large) alphabet. In all, a maximum of 52 different random variables
     //  can thus be used. This number is significantly higher than, the
     //  useful information expressions (atleast demanded so far). Moreover, the
@@ -179,7 +179,7 @@ int destroy_doc_words(){
     if(i>51){ /* If there are too many words: */
       word_error = 3; /* this will cause itip() to quit without calling ITIP */
     }
-    
+
     if(i>25){
       fprintf(yyout,"%c",'a'+i-26);
     }
@@ -210,10 +210,10 @@ expressions1 = (char **)malloc( (num_expressions) *sizeof(char *));
 for(kindex=0;kindex<num_expressions;kindex++)
     {
     expressions1[kindex] = (char *)malloc( (strlen(expressions[kindex]) + 1) * sizeof(char )); //new +1
-    
+
     }
-    
-    
+
+
 f1 = fopen("expout.txt","w");
 for (inumber=0;inumber <num_expressions;inumber++)
 {
@@ -239,7 +239,7 @@ if(word_error != 0){
 f2 = fopen("Output.txt","r");
     ii=0;
 
-while (!feof(f2)) 
+while (!feof(f2))
 {
     fscanf(f2,"%s\n",expressions1[ii]);
     ii++;
