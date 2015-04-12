@@ -3,9 +3,11 @@ Citip
 
 Information Theoretic Inequality Prover (C++/CLI version).
 
-This program is a fork of Xitip_ which is based on ITIP_ and depends on
-QSopt_. At this point, the only difference from Xitip is, that the GTK
-frontend was replaced by a simple CLI frontend.
+This program is a fork of Xitip_ which is based on ITIP_. So far, the
+differences from Xitip are:
+
+- replace the GTK frontend by a simple CLI frontend
+- ported to the free software GLPK_ library for linear programming
 
 *Why fork?*
 
@@ -22,16 +24,15 @@ frontend was replaced by a simple CLI frontend.
 
 .. _Xitip: http://xitip.epfl.ch/
 .. _ITIP: http://user-www.ie.cuhk.edu.hk/~ITIP/
-.. _QSopt: http://www.math.uwaterloo.ca/~bico/qsopt/
+.. _GLPK: https://www.gnu.org/software/glpk/
 
 
 Build
 -----
 
-First, you need to obtain a version of QSopt_ suited for your platform. Copy
-the ``qsopt.h`` as well as the ``qsopt.a`` files into the Citip folder. Note
-that QSopt is not open source but can be used at no cost for research and
-educational purposes.
+First, you need to obtain a version of GLPK_ suited for your platform. It
+is highly likely that you can grab GLPK from your distribution's official
+repositories. Otherwise, see their website for instructions.
 
 In the best case scenario, Citip can now be built by simply running the
 ``make`` command. Everything put together, your build process could look as
@@ -39,14 +40,9 @@ follows:
 
 .. code-block:: bash
 
+    sudo apt-get install libglpk-dev
     git clone https://github.com/coldfix/Citip.git
     cd Citip
-
-    # QSopt for 64bit linux:
-    wget http://www.math.uwaterloo.ca/~bico//qsopt/beta/codes/linux64/qsopt.a
-    wget http://www.math.uwaterloo.ca/~bico//qsopt/beta/codes/linux64/qsopt.h
-
-    # build
     make
 
 
