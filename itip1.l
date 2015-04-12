@@ -53,7 +53,6 @@
 #include "ITIP.h"
 #define WordLength 300
 
-//int itip(char **expressions, int num_expressions);
 struct doc_words
 {
     char words[WordLength];
@@ -69,10 +68,9 @@ struct doc_words *getmem()
 {
     struct doc_words *p;
     p = malloc(sizeof(struct doc_words));
-    //p = (struct doc_words*)malloc(sizeof( doc_words));
     if(!p)
     {
-        /* printf("out of memory");*/
+        // out of memory
         return(0);
     }
     else

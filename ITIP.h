@@ -66,18 +66,4 @@ long int tagmask ;
 
 double number,*nptr ;
 int c,offset ;
-/*struct EQN
-{
-    double coef ;
-    long int variable ;
-    struct EQN *next ;
-} *eqn, *current, *boundary ;
-
-struct EQNLIST
-{
-    struct EQN *eqn ;
-    int argtype ;
-    struct EQNLIST *next ;
-} *arghead, *arglist ;
-*/
 int delimiters[30], limcount ;

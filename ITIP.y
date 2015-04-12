@@ -81,11 +81,9 @@ char argnumber,status,itype,macrodetect ;
 int numofinput,extrainput,multi,objcount;
 
 char *input,buffer[255],ncount,fcount,vcount,condflag ;
-//long int field[250],attribute,attrib[26],flag ;
 long int field[250],attribute,attrib[52],flag ;  /* Ratna : 26*2 to have
 small letter English alphabet as random variables*/
 
-//char rvnames[26][27],rvnames2[26][27],name[60] ;
 char rvnames[52][27],rvnames2[52][27],name[60] ; // 26*2 x 2 dimension seems to be enough (Ratna)
 
 long int rvtag[52] ;
@@ -689,7 +687,6 @@ int yylex()
 int yyerror(char *s)
 {
     struct EQN *temp ;
-/*         printf("%s\n",s) ; */
     free_eqn() ;
     status = 1 ;
     return(-1) ;
@@ -765,13 +762,11 @@ int ITIP(char **expressions, int number_expressions){
         ncount = 0 ;
         fcount = 0 ;
         c = 0 ;
-       
+
         if(strlen(expressions[argnumber]) >= 900){
             input = realloc(input, 2*strlen(expressions[argnumber])*sizeof(char));
         }
         strcpy(input, expressions[argnumber]);
-
-/*     printf("argument%d: --%s--\n", argnumber, input); */
 
         arglist->eqn = (struct EQN *) malloc(sizeof(struct EQN)) ;
         eqn = arglist->eqn ;
@@ -780,10 +775,7 @@ int ITIP(char **expressions, int number_expressions){
         macrodetect = 0 ;
         if(yyparse())
         {
-/*         printf("Input Syntax wrong: Check the input expression (Ratna)\n"); */
-/*         printf("Syntax error on the expression:%s\n",  input); */
-            return (-2-argnumber);
-    //exit(0);
+            return (-2-argnumber);  // syntax error in expression
         }
 
 
@@ -887,7 +879,7 @@ int ITIP(char **expressions, int number_expressions){
 
     if(b==-1)
     {
-/*       printf("Constraints cannot be inequalities.\n") ; */
+        // Constraints cannot be inequalities.
         for(i=0; i<numofinput+extrainput; i++){
             free(inmatrix[i]);
         }
@@ -956,25 +948,18 @@ int ITIP(char **expressions, int number_expressions){
             glp_set_obj_coef(lp, j, inmatrix[objcount][j-1]);
         }
 
-
-        /*debug: write problem to file*/
-        /*  QSwrite_prob(lp, "outfile.lp", "LP");*/
-
         /*solve linear program:*/
         glp_init_smcp(&parm);
         parm.msg_lev = GLP_MSG_ERR;
         outcome = glp_simplex(lp, &parm);
         if(outcome != 0){
-        /*       puts("function QSopt_primal returned an error!"); */
+            // TODO: return error
         }
         status = glp_get_status(lp);
-
-        /*lpx_write_cpxlp(lp, "LP.cplex");*/ /*for debugging*/
 
         /*test whether an optimal solution has been found:*/
         if(status != GLP_OPT){
             result = 0;
-    /*       puts("no optimal solution found"); */
         }
         else{ /*if the solution is optimal, check whether it is all-zero*/
             // the original check was for the solution (primal variable values)
@@ -994,18 +979,12 @@ int ITIP(char **expressions, int number_expressions){
                     glp_set_obj_coef(lp, j, - inmatrix[objcount][j-1]);
                 }
 
-                /*debug: write problem to file*/
-                /*      QSwrite_prob(lp, "outfile2.lp", "LP");*/
-
-
                 /*solve linear program:*/
                 outcome = glp_simplex(lp, &parm);
                 if(outcome != 0){
                 /*    puts("function QSopt_primal returned an error!"); */
                 }
                 status = glp_get_status(lp);
-
-                /*lpx_write_cpxlp(lp, "LP.cplex");*/ /*for debugging*/
 
                 /*test whether an optimal solution has been found:*/
                 if(status != GLP_OPT){
@@ -1019,14 +998,6 @@ int ITIP(char **expressions, int number_expressions){
             }
         }
     }/*end objcount loop*/
-
-/*   if(result == 1){ */
-/*     printf("\nTRUE\n\n"); */
-/*   } */
-/*   else{ */
-/*     printf("\nNot solvable by Xitip\n\n"); */
-/*   } */
-
 
     /*free memory*/
     free(row_indices);
