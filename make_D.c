@@ -93,12 +93,12 @@ void make_D(glp_prob* lp, int number_vars) /*number_constraints indicates the nu
     double val_tmp;
 
     if (number_vars == 1) {
-      ind_tmp = 1;
-      val_tmp = 1;
-      row = glp_add_rows(lp, 1);
-      glp_set_row_bnds(lp, row, GLP_LO, 0.0, NAN);
-      glp_set_mat_row(lp, row, 1, (&ind_tmp)-1, (&val_tmp)-1);
-      return;
+        ind_tmp = 1;
+        val_tmp = 1;
+        row = glp_add_rows(lp, 1);
+        glp_set_row_bnds(lp, row, GLP_LO, 0.0, NAN);
+        glp_set_mat_row(lp, row, 1, (&ind_tmp)-1, (&val_tmp)-1);
+        return;
     }
 
     number_rows = glp_get_num_rows(lp);
@@ -112,19 +112,19 @@ void make_D(glp_prob* lp, int number_vars) /*number_constraints indicates the nu
     /*row k will contain the quantity H(X1,X2,....,XN) - H(X1,X2,...,X(k-1),X(k+1),...,XN), where k=index*/
     for(index=1;index<=number_vars;index++)
     {
-      s1 = (1L << (index - 1)) ; /*s1 is 2^(index-1)*/
+        s1 = (1L << (index - 1)) ; /*s1 is 2^(index-1)*/
 
-      indices[0] = number_cols; /* H(X1,...,XN)*/ /*in GLPK, matrix-indices start at 1*/
-      values[0] = -1;
-      indices[1] = number_cols - s1; /* H( {X1,...,XN} minus {k} ) */
-      values[1] = 1;
+        indices[0] = number_cols; /* H(X1,...,XN)*/ /*in GLPK, matrix-indices start at 1*/
+        values[0] = -1;
+        indices[1] = number_cols - s1; /* H( {X1,...,XN} minus {k} ) */
+        values[1] = 1;
 
-      number_rows++;
+        number_rows++;
 
-      /*add new row to the LP:*/
-      row = glp_add_rows(lp, 1);
-      glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
-      glp_set_mat_row(lp, row, 2, indices-1, values-1);
+        /*add new row to the LP:*/
+        row = glp_add_rows(lp, 1);
+        glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
+        glp_set_mat_row(lp, row, 2, indices-1, values-1);
     }
 
 
@@ -132,54 +132,54 @@ void make_D(glp_prob* lp, int number_vars) /*number_constraints indicates the nu
 
     /* this loop is for I(X_{i+1}; X_{j+1} | X_K), where K is a subset of { {1,...,number_vars} minus {i+1, j+1}} */
     for(i=0;i<(number_vars-1);i++){
-      for(j=i+1;j<number_vars;j++){
-        s1 = 1L << i ; /*the single variable X_k has coordinate (1L << k-1) in the joint entropy space (k = 1,...,number_vars)*/
-        s2 = 1L << j ;
-        mask = s1 | s2 ; /*this is the index of (X_(i+1),X_(j+1))*/
+        for(j=i+1;j<number_vars;j++){
+            s1 = 1L << i ; /*the single variable X_k has coordinate (1L << k-1) in the joint entropy space (k = 1,...,number_vars)*/
+            s2 = 1L << j ;
+            mask = s1 | s2 ; /*this is the index of (X_(i+1),X_(j+1))*/
 
-        /*first row ( for K = {} ):*/
-        indices[0] = s1; /*H(X_(i+1))*/
-        values[0] = -1;
+            /*first row ( for K = {} ):*/
+            indices[0] = s1; /*H(X_(i+1))*/
+            values[0] = -1;
 
-        indices[1] = s2; /*H(X_(j+1))*/
-        values[1] = -1;
+            indices[1] = s2; /*H(X_(j+1))*/
+            values[1] = -1;
 
-        indices[2] = mask; /* H(X_(i+1),X_(j+1)) */
-        values[2] = 1;
+            indices[2] = mask; /* H(X_(i+1),X_(j+1)) */
+            values[2] = 1;
 
-        number_rows++;
+            number_rows++;
 
-        /*add new row to the LP*/
-        row = glp_add_rows(lp, 1);
-        glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
-        glp_set_mat_row(lp, row, 3, indices-1, values-1);
+            /*add new row to the LP*/
+            row = glp_add_rows(lp, 1);
+            glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
+            glp_set_mat_row(lp, row, 3, indices-1, values-1);
 
 
 
-        /*additional rows for all non-empty K:*/
-        for(temp=1;temp<=number_cols;temp++) { /* temp runs through all possible subsets of (X_1, ..., X_N)*/
-          if(!(temp & mask)) { /*if K != (i+1,j+1)*/
-        indices[0] = (s1 | temp); /* H(X_(i+1), X_K) */
-        values[0] = -1;
+            /*additional rows for all non-empty K:*/
+            for(temp=1;temp<=number_cols;temp++) { /* temp runs through all possible subsets of (X_1, ..., X_N)*/
+                if(!(temp & mask)) { /*if K != (i+1,j+1)*/
+                    indices[0] = (s1 | temp); /* H(X_(i+1), X_K) */
+                    values[0] = -1;
 
-        indices[1] = (s2 | temp); /* H(X_(j+1), X_K) */
-        values[1] = -1;
+                    indices[1] = (s2 | temp); /* H(X_(j+1), X_K) */
+                    values[1] = -1;
 
-        indices[2] = temp; /* H(X_K) */
-        values[2] = 1;
+                    indices[2] = temp; /* H(X_K) */
+                    values[2] = 1;
 
-        indices[3] = (s1 | s2 | temp); /* H(X_(i+1), X_(j+1), X_K) */
-        values[3] = 1;
+                    indices[3] = (s1 | s2 | temp); /* H(X_(i+1), X_(j+1), X_K) */
+                    values[3] = 1;
 
-        number_rows++;
+                    number_rows++;
 
-        /*add new row to the LP*/
-        row = glp_add_rows(lp, 1);
-        glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
-        glp_set_mat_row(lp, row, 4, indices-1, values-1);
-          }
+                    /*add new row to the LP*/
+                    row = glp_add_rows(lp, 1);
+                    glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
+                    glp_set_mat_row(lp, row, 4, indices-1, values-1);
+                }
+            }
         }
-      }
     }
 
     free(indices);

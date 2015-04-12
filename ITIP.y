@@ -683,12 +683,12 @@ int yylex()
 {
     while(input[c]==' ')
         c++ ;
-        return(input[c++]) ;
+    return(input[c++]) ;
 }
 
 int yyerror(char *s)
 {
-        struct EQN *temp ;
+    struct EQN *temp ;
 /*         printf("%s\n",s) ; */
     free_eqn() ;
     status = 1 ;
@@ -698,328 +698,327 @@ int yyerror(char *s)
 
 void testoutput(double **inmatrix, int *intype, int multi, int numberequations, int numbervars)
 {
-  int i,j;
+    int i,j;
 
-  puts("inmatrix:");
-  for(i=0; i<numberequations; i++){
-    for(j=0; j<numbervars; j++){
-      printf("%d\t", (int)inmatrix[i][j]);
+    puts("inmatrix:");
+    for(i=0; i<numberequations; i++){
+        for(j=0; j<numbervars; j++){
+            printf("%d\t", (int)inmatrix[i][j]);
+        }
+        printf("\n");
     }
-    printf("\n");
-  }
 
-  puts("");
-  puts("intype:");
-  for(i=0; i<numberequations; i++){
-    printf("%d\t", intype[i]);
-  }
+    puts("");
+    puts("intype:");
+    for(i=0; i<numberequations; i++){
+        printf("%d\t", intype[i]);
+    }
 
-  puts("");
-  puts("multi:");
-  printf("%d\n", multi);
+    puts("");
+    puts("multi:");
+    printf("%d\n", multi);
 }
 
 
 int ITIP(char **expressions, int number_expressions){
-  int temp;
-  long b;
-  int *intype;
-  double **inmatrix;
-  int i,j;
-  glp_prob* lp;
-  int row_length;
-  int *row_indices;
-  double *row_values, *x; /*every constraint has a 0 on the right-hand-side*/
-  int row_sense;
-  int result = 1, outcome, status;
-  int row, col;
-  glp_smcp parm;
+    int temp;
+    long b;
+    int *intype;
+    double **inmatrix;
+    int i,j;
+    glp_prob* lp;
+    int row_length;
+    int *row_indices;
+    double *row_values, *x; /*every constraint has a 0 on the right-hand-side*/
+    int row_sense;
+    int result = 1, outcome, status;
+    int row, col;
+    glp_smcp parm;
 
-  for(temp=0;temp<52;temp++){
-    attrib[temp] = 0 ;
-    rvnames[temp][1] = '\0' ;
-  }
-
-  flag = 1 ;
-  vcount = 0 ;
-  status = 0 ;
-  extrainput = 0 ;
-  multi = 1 ;
-  /*
-    multi tells us how many objective functions there are.
-    The objective function is always the first input string.
-    However, if the first input string is a Markov chain (type 3 macro) involving 4 or
-    more groups of variables, e.g. AB/C/U/XY, then this can not
-    be expressed using a single objective function.
-  */
-
-  arghead = (struct EQNLIST *) malloc(sizeof(struct EQNLIST)) ;
-  arglist = arghead ;
-  arglist->eqn = NULL ;
-  arglist->next = NULL ;
-
-  input = (char *)malloc(1000*sizeof(char));
-
-  /* parse the expressions one by one: */
-  for(argnumber=0; argnumber<number_expressions; argnumber++){
-    ncount = 0 ;
-    fcount = 0 ;
-    c = 0 ;
-
-    if(strlen(expressions[argnumber]) >= 900){
-      input = realloc(input, 2*strlen(expressions[argnumber])*sizeof(char));
+    for(temp=0;temp<52;temp++){
+        attrib[temp] = 0 ;
+        rvnames[temp][1] = '\0' ;
     }
-    strcpy(input, expressions[argnumber]);
+
+    flag = 1 ;
+    vcount = 0 ;
+    status = 0 ;
+    extrainput = 0 ;
+    multi = 1 ;
+    /*
+      multi tells us how many objective functions there are.
+      The objective function is always the first input string.
+      However, if the first input string is a Markov chain (type 3 macro) involving 4 or
+      more groups of variables, e.g. AB/C/U/XY, then this can not
+      be expressed using a single objective function.
+    */
+
+    arghead = (struct EQNLIST *) malloc(sizeof(struct EQNLIST)) ;
+    arglist = arghead ;
+    arglist->eqn = NULL ;
+    arglist->next = NULL ;
+
+    input = (char *)malloc(1000*sizeof(char));
+
+    /* parse the expressions one by one: */
+    for(argnumber=0; argnumber<number_expressions; argnumber++){
+        ncount = 0 ;
+        fcount = 0 ;
+        c = 0 ;
+       
+        if(strlen(expressions[argnumber]) >= 900){
+            input = realloc(input, 2*strlen(expressions[argnumber])*sizeof(char));
+        }
+        strcpy(input, expressions[argnumber]);
 
 /*     printf("argument%d: --%s--\n", argnumber, input); */
 
-    arglist->eqn = (struct EQN *) malloc(sizeof(struct EQN)) ;
-    eqn = arglist->eqn ;
-    eqn->next = NULL ;
-    current = eqn ;
-    macrodetect = 0 ;
-    if(yyparse())
-    {
+        arglist->eqn = (struct EQN *) malloc(sizeof(struct EQN)) ;
+        eqn = arglist->eqn ;
+        eqn->next = NULL ;
+        current = eqn ;
+        macrodetect = 0 ;
+        if(yyparse())
+        {
 /*         printf("Input Syntax wrong: Check the input expression (Ratna)\n"); */
 /*         printf("Syntax error on the expression:%s\n",  input); */
-        return (-2-argnumber);
+            return (-2-argnumber);
     //exit(0);
-  }
+        }
 
 
+        if(status){
+            free_eqn() ;
+            free(input);
+            return 20; /* any value larger than 6 will lead to an "unexpected error" message */
+        }
+        switch(macrodetect)
+        {
+            case 1: expandmacro1() ; break ;
+            case 2: expandmacro2() ; break ;
+            case 3: expandmacro3() ;
+        }
 
-    if(status){
-      free_eqn() ;
-      free(input);
-      return 20; /* any value larger than 6 will lead to an "unexpected error" message */
+
+        if(macrodetect!=3)
+        {
+            arglist->next = (struct EQNLIST *) malloc(sizeof(struct EQNLIST)) ;
+            arglist = arglist->next ;
+            arglist->eqn = NULL ;
+            arglist->next = NULL ;
+        }
     }
-    switch(macrodetect)
-      {
-      case 1: expandmacro1() ; break ;
-      case 2: expandmacro2() ; break ;
-      case 3: expandmacro3() ;
-      }
+    numofinput = argnumber;
+    /*end of file-reading and parsing*/
 
-
-    if(macrodetect!=3)
-      {
-    arglist->next = (struct EQNLIST *) malloc(sizeof(struct EQNLIST)) ;
-    arglist = arglist->next ;
-    arglist->eqn = NULL ;
-    arglist->next = NULL ;
-      }
-  }
-  numofinput = argnumber;
-  /*end of file-reading and parsing*/
-
-  /*always do optimization (collapses variables that always appear together)*/
-  rvtotal = 0 ;
-  tagmask = 0 ;
-  arglist = arghead ;
-  while(arglist!=NULL) {
-    if(arglist->eqn!=NULL)
-      {
-    eqn = arglist->eqn ;
-    reduce_rv() ;
-      }
-    arglist = arglist->next ;
-  }
-
-  if(flag > 1L<<rvtotal) {
+    /*always do optimization (collapses variables that always appear together)*/
+    rvtotal = 0 ;
+    tagmask = 0 ;
     arglist = arghead ;
     while(arglist!=NULL) {
-      if(arglist->eqn!=NULL)
+        if(arglist->eqn!=NULL)
+        {
+            eqn = arglist->eqn ;
+            reduce_rv() ;
+        }
+        arglist = arglist->next ;
+    }
+
+    if(flag > 1L<<rvtotal) {
+        arglist = arghead ;
+        while(arglist!=NULL) {
+            if(arglist->eqn!=NULL)
+            {
+                eqn = arglist->eqn ;
+                map_rv() ;
+            }
+            arglist = arglist->next ;
+        }
+        flag = 1L<<rvtotal ;
+    }
+    /*end of optimization*/
+
+    /*flag-1 is the number of dimensions in the vector representation space*/
+    /*numofinput+extrainput is the number of equations*/
+    inmatrix = (double **)malloc((numofinput+extrainput)*sizeof(double *));
+    for(i=0; i < numofinput+extrainput; i++){
+        /*inmatrix contains the vector representation of one equation in each row*/
+        inmatrix[i] = (double *)malloc((flag-1)*sizeof(double));
+        /* first set all the entries to zero:*/
+        for(j=0; j<flag-1; j++){
+            inmatrix[i][j] = 0;
+        }
+    }
+
+    /*write the equations into inmatrix (one per row):*/
+    argnumber = 0 ;
+    arglist = arghead ;
+    while(arglist!=NULL)
     {
-      eqn = arglist->eqn ;
-      map_rv() ;
+        if(arglist->eqn!=NULL)
+        {
+            eqn = arglist->eqn ;
+            expand(inmatrix[argnumber]);
+        }
+        argnumber++ ;
+        arglist = arglist->next ;
     }
-      arglist = arglist->next ;
-    }
-    flag = 1L<<rvtotal ;
-  }
-  /*end of optimization*/
 
-  /*flag-1 is the number of dimensions in the vector representation space*/
-  /*numofinput+extrainput is the number of equations*/
-  inmatrix = (double **)malloc((numofinput+extrainput)*sizeof(double *));
-  for(i=0; i < numofinput+extrainput; i++){
-    /*inmatrix contains the vector representation of one equation in each row*/
-    inmatrix[i] = (double *)malloc((flag-1)*sizeof(double));
-    /* first set all the entries to zero:*/
-    for(j=0; j<flag-1; j++){
-      inmatrix[i][j] = 0;
-    }
-  }
-
-  /*write the equations into inmatrix (one per row):*/
-  argnumber = 0 ;
-  arglist = arghead ;
-  while(arglist!=NULL)
+    /*in intype, we store whether the equation is an equality (==0) or an inequality (==1)*/
+    intype = (int *)malloc((numofinput+extrainput)*sizeof(int));
+    argnumber = 0 ;
+    arglist = arghead ;
+    while(arglist!=NULL)
     {
-      if(arglist->eqn!=NULL)
-    {
-      eqn = arglist->eqn ;
-      expand(inmatrix[argnumber]);
-    }
-      argnumber++ ;
-      arglist = arglist->next ;
+        if(arglist->eqn!=NULL)
+            intype[argnumber] = arglist->argtype ;
+        argnumber++ ;
+        arglist = arglist->next ;
     }
 
-  /*in intype, we store whether the equation is an equality (==0) or an inequality (==1)*/
-  intype = (int *)malloc((numofinput+extrainput)*sizeof(int));
-  argnumber = 0 ;
-  arglist = arghead ;
-  while(arglist!=NULL)
-    {
-      if(arglist->eqn!=NULL)
-    intype[argnumber] = arglist->argtype ;
-      argnumber++ ;
-      arglist = arglist->next ;
-    }
+    free_eqn() ;
 
-  free_eqn() ;
+    for(b=multi;b<=numofinput+extrainput-1;b++)
+        if(intype[b])
+        {
+            b=-1;
+            break;
+        }
 
-  for(b=multi;b<=numofinput+extrainput-1;b++)
-    if(intype[b])
-      {
-    b=-1;
-    break;
-      }
-
-  if(b==-1)
+    if(b==-1)
     {
 /*       printf("Constraints cannot be inequalities.\n") ; */
-      for(i=0; i<numofinput+extrainput; i++){
-    free(inmatrix[i]);
-      }
-      free(inmatrix);
-      free(intype);
-      free(input);
-      return 5;
+        for(i=0; i<numofinput+extrainput; i++){
+            free(inmatrix[i]);
+        }
+        free(inmatrix);
+        free(intype);
+        free(input);
+        return 5;
     }
 
 
-  /*LINEAR PROGRAMMING PART:*/
+    /*LINEAR PROGRAMMING PART:*/
 
-  /*x is here to hold the optimal solutions:*/
-  x = (double *)malloc((flag-1) * sizeof(double));
-
-
-  /*construct the linear program object:*/
-  /*and set the optimization-direction:*/
-  lp = glp_create_prob();
-  glp_set_prob_name(lp, "ITIP_problem");
-  glp_set_obj_dir(lp, GLP_MIN);
+    /*x is here to hold the optimal solutions:*/
+    x = (double *)malloc((flag-1) * sizeof(double));
 
 
-  /*add all primal variables; we do not yet set their coefficients in the objective function:*/
-  for(j=0; j<flag-1; j++){
-    col = glp_add_cols(lp, 1);
-    glp_set_col_bnds(lp, col, GLP_LO, 0, NAN);
-  }
+    /*construct the linear program object:*/
+    /*and set the optimization-direction:*/
+    lp = glp_create_prob();
+    glp_set_prob_name(lp, "ITIP_problem");
+    glp_set_obj_dir(lp, GLP_MIN);
 
-  row_indices = (int *)malloc((flag-1)*sizeof(int));
-  row_values = (double *)malloc((flag-1)*sizeof(double));
-  /*add all the user-provided constraints to the constraint matrix:*/
-  for(i=multi; i<numofinput+extrainput; i++){ /*numofinput+extrainput is the number of rows in inmatrix */
+
+    /*add all primal variables; we do not yet set their coefficients in the objective function:*/
+    for(j=0; j<flag-1; j++){
+        col = glp_add_cols(lp, 1);
+        glp_set_col_bnds(lp, col, GLP_LO, 0, NAN);
+    }
+
+    row_indices = (int *)malloc((flag-1)*sizeof(int));
+    row_values = (double *)malloc((flag-1)*sizeof(double));
+    /*add all the user-provided constraints to the constraint matrix:*/
+    for(i=multi; i<numofinput+extrainput; i++){ /*numofinput+extrainput is the number of rows in inmatrix */
     /*starts at multi because the first multi rows of inmatrix are the objective functions*/
-    row_length = 0;
-    for(j=0; j<flag-1; j++){ /*for every element in the row*/
-      if(inmatrix[i][j] != 0){
-    /*append elements to lp constraint row:*/
-    row_values[row_length] = inmatrix[i][j];
-    row_indices[row_length] = j+1;
-    row_length++;
-      }
-      /* else (if inmatrix[i][j] is zero), do nothing */
-    }
-    /*decide whether the current row is an equality or an inequality:*/
-    if(intype[i] == 1){ /*if the row is an inequality*/
-      row_sense = GLP_UP;
-    }
-    else{ /*if the row is an equality*/
-      row_sense = GLP_FX; /*row must be less than 0*/
-    }
-    row = glp_add_rows(lp, 1);
-    glp_set_row_bnds(lp, row, row_sense, 0.0, 0.0);
-    glp_set_mat_row(lp, row, row_length, row_indices-1, row_values-1);
-  }
-
-  /*add all the Shannon-type constraints:*/
-  make_D(lp,rvtotal);
-
-
-  /*for every objective function, we check the following:*/
-  for(objcount=0; objcount < multi; objcount++){
-
-    /*set the objective function for the columns:*/
-    for(j=1; j<flag; j++){
-      glp_set_obj_coef(lp, j, inmatrix[objcount][j-1]);
+        row_length = 0;
+        for(j=0; j<flag-1; j++){ /*for every element in the row*/
+            if(inmatrix[i][j] != 0){
+                /*append elements to lp constraint row:*/
+                row_values[row_length] = inmatrix[i][j];
+                row_indices[row_length] = j+1;
+                row_length++;
+            }
+            /* else (if inmatrix[i][j] is zero), do nothing */
+        }
+        /*decide whether the current row is an equality or an inequality:*/
+        if(intype[i] == 1){ /*if the row is an inequality*/
+            row_sense = GLP_UP;
+        }
+        else{ /*if the row is an equality*/
+            row_sense = GLP_FX; /*row must be less than 0*/
+        }
+        row = glp_add_rows(lp, 1);
+        glp_set_row_bnds(lp, row, row_sense, 0.0, 0.0);
+        glp_set_mat_row(lp, row, row_length, row_indices-1, row_values-1);
     }
 
-
-    /*debug: write problem to file*/
-    /*  QSwrite_prob(lp, "outfile.lp", "LP");*/
-
-    /*solve linear program:*/
-    glp_init_smcp(&parm);
-    parm.msg_lev = GLP_MSG_ERR;
-    outcome = glp_simplex(lp, &parm);
-    if(outcome != 0){
-/*       puts("function QSopt_primal returned an error!"); */
-    }
-    status = glp_get_status(lp);
-
-    /*lpx_write_cpxlp(lp, "LP.cplex");*/ /*for debugging*/
-
-    /*test whether an optimal solution has been found:*/
-    if(status != GLP_OPT){
-      result = 0;
-/*       puts("no optimal solution found"); */
-    }
-    else{ /*if the solution is optimal, check whether it is all-zero*/
-      // the original check was for the solution (primal variable values)
-      // rather than objective value, but let's do it simpler for now:
-      // (if an optimum is found, it should be zero anyway)
-      if (glp_get_obj_val(lp) != 0.0) {
-        result = 0;
-      }
-    }
-
-    /*if this first test was positive:*/
-    if(result == 1){
-      /*check whether a second test is necessary (this is the case if we have to check for equality)*/
-      if(intype[0] == 0){
-    /*change the objective function in the LPX object:*/
-    for(j=1; j<flag; j++){
-      glp_set_obj_coef(lp, j, - inmatrix[objcount][j-1]);
-    }
-
-    /*debug: write problem to file*/
-    /*      QSwrite_prob(lp, "outfile2.lp", "LP");*/
+    /*add all the Shannon-type constraints:*/
+    make_D(lp,rvtotal);
 
 
-    /*solve linear program:*/
-    outcome = glp_simplex(lp, &parm);
-    if(outcome != 0){
-/*    puts("function QSopt_primal returned an error!"); */
-    }
-    status = glp_get_status(lp);
+    /*for every objective function, we check the following:*/
+    for(objcount=0; objcount < multi; objcount++){
 
-    /*lpx_write_cpxlp(lp, "LP.cplex");*/ /*for debugging*/
+        /*set the objective function for the columns:*/
+        for(j=1; j<flag; j++){
+            glp_set_obj_coef(lp, j, inmatrix[objcount][j-1]);
+        }
 
-    /*test whether an optimal solution has been found:*/
-    if(status != GLP_OPT){
-      result = 0;
-    }
-    else{  /*if the solution is optimal, check whether it is all-zero*/
-      if (glp_get_obj_val(lp) != 0.0) {
-        result = 0;
-      }
-    }
-      }
-    }
-  }/*end objcount loop*/
+
+        /*debug: write problem to file*/
+        /*  QSwrite_prob(lp, "outfile.lp", "LP");*/
+
+        /*solve linear program:*/
+        glp_init_smcp(&parm);
+        parm.msg_lev = GLP_MSG_ERR;
+        outcome = glp_simplex(lp, &parm);
+        if(outcome != 0){
+        /*       puts("function QSopt_primal returned an error!"); */
+        }
+        status = glp_get_status(lp);
+
+        /*lpx_write_cpxlp(lp, "LP.cplex");*/ /*for debugging*/
+
+        /*test whether an optimal solution has been found:*/
+        if(status != GLP_OPT){
+            result = 0;
+    /*       puts("no optimal solution found"); */
+        }
+        else{ /*if the solution is optimal, check whether it is all-zero*/
+            // the original check was for the solution (primal variable values)
+            // rather than objective value, but let's do it simpler for now:
+            // (if an optimum is found, it should be zero anyway)
+            if (glp_get_obj_val(lp) != 0.0) {
+                result = 0;
+            }
+        }
+
+        /*if this first test was positive:*/
+        if(result == 1){
+            /*check whether a second test is necessary (this is the case if we have to check for equality)*/
+            if(intype[0] == 0){
+                /*change the objective function in the LPX object:*/
+                for(j=1; j<flag; j++){
+                    glp_set_obj_coef(lp, j, - inmatrix[objcount][j-1]);
+                }
+
+                /*debug: write problem to file*/
+                /*      QSwrite_prob(lp, "outfile2.lp", "LP");*/
+
+
+                /*solve linear program:*/
+                outcome = glp_simplex(lp, &parm);
+                if(outcome != 0){
+                /*    puts("function QSopt_primal returned an error!"); */
+                }
+                status = glp_get_status(lp);
+
+                /*lpx_write_cpxlp(lp, "LP.cplex");*/ /*for debugging*/
+
+                /*test whether an optimal solution has been found:*/
+                if(status != GLP_OPT){
+                    result = 0;
+                }
+                else{  /*if the solution is optimal, check whether it is all-zero*/
+                    if (glp_get_obj_val(lp) != 0.0) {
+                        result = 0;
+                    }
+                }
+            }
+        }
+    }/*end objcount loop*/
 
 /*   if(result == 1){ */
 /*     printf("\nTRUE\n\n"); */
@@ -1029,18 +1028,18 @@ int ITIP(char **expressions, int number_expressions){
 /*   } */
 
 
-  /*free memory*/
-  free(row_indices);
-  free(row_values);
-  free(x);
-  glp_delete_prob(lp);
-  for(i=0; i<numofinput+extrainput; i++){
-    free(inmatrix[i]);
-  }
-  free(inmatrix);
-  free(intype);
+    /*free memory*/
+    free(row_indices);
+    free(row_values);
+    free(x);
+    glp_delete_prob(lp);
+    for(i=0; i<numofinput+extrainput; i++){
+        free(inmatrix[i]);
+    }
+    free(inmatrix);
+    free(intype);
 
-  free(input);
+    free(input);
 
-  return result;
+    return result;
 }
