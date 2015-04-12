@@ -59,8 +59,8 @@ OBJS= make_D.o ITIP.o itip1.o Citip.o
 
 all: Citip
 
-Citip: $(OBJS) qsopt.a
-	g++ -o $@ $^
+Citip: $(OBJS)
+	g++ -o $@ $^ -lglpk
 
 Citip.o: Citip.cpp
 	g++ -std=c++11 -c $<

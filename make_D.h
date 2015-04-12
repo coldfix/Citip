@@ -50,4 +50,4 @@
  * For solving the linear programs, we use the QSopt callable library,
  * available at http://www2.isye.gatech.edu/~wcook/qsopt/
  */
-void make_D(QSprob lp, int number_vars);
+void make_D(glp_prob* lp, int number_vars);

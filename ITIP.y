@@ -74,7 +74,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "qsopt.h"
+#include <glpk.h>
 #include "make_D.h"
 
 char argnumber,status,itype,macrodetect ;
@@ -726,12 +726,14 @@ int ITIP(char **expressions, int number_expressions){
   int *intype;
   double **inmatrix;
   int i,j;
-  QSprob lp;
+  glp_prob* lp;
   int row_length;
   int *row_indices;
   double *row_values, *x; /*every constraint has a 0 on the right-hand-side*/
-  char row_sense;
+  int row_sense;
   int result = 1, outcome, status;
+  int row, col;
+  glp_smcp parm;
 
   for(temp=0;temp<52;temp++){
     attrib[temp] = 0 ;
@@ -905,12 +907,15 @@ int ITIP(char **expressions, int number_expressions){
 
   /*construct the linear program object:*/
   /*and set the optimization-direction:*/
-  lp = QScreate_prob("ITIP_problem", QS_MIN);
+  lp = glp_create_prob();
+  glp_set_prob_name(lp, "ITIP_problem");
+  glp_set_obj_dir(lp, GLP_MIN);
   
 
   /*add all primal variables; we do not yet set their coefficients in the objective function:*/
   for(j=0; j<flag-1; j++){
-    QSnew_col(lp, 0, 0, QS_MAXDOUBLE, NULL);
+    col = glp_add_cols(lp, 1);
+    glp_set_col_bnds(lp, col, GLP_LO, 0, NAN);
   }
 
   row_indices = (int *)malloc((flag-1)*sizeof(int));
@@ -923,19 +928,21 @@ int ITIP(char **expressions, int number_expressions){
       if(inmatrix[i][j] != 0){
 	/*append elements to lp constraint row:*/
 	row_values[row_length] = inmatrix[i][j]; 
-	row_indices[row_length] = j;
+	row_indices[row_length] = j+1;
 	row_length++;
       }
       /* else (if inmatrix[i][j] is zero), do nothing */
     }
     /*decide whether the current row is an equality or an inequality:*/
     if(intype[i] == 1){ /*if the row is an inequality*/
-      row_sense = 'L';
+      row_sense = GLP_UP;
     }
     else{ /*if the row is an equality*/
-      row_sense = 'E'; /*row must be less than 0*/
+      row_sense = GLP_FX; /*row must be less than 0*/
     }
-    QSadd_row(lp, row_length, row_indices, row_values, 0, row_sense, NULL);
+    row = glp_add_rows(lp, 1);
+    glp_set_row_bnds(lp, row, row_sense, 0.0, 0.0);
+    glp_set_mat_row(lp, row, row_length, row_indices-1, row_values-1);
   }
 
   /* Ratna:the number of random variables must not be 1:
@@ -961,8 +968,8 @@ int ITIP(char **expressions, int number_expressions){
   for(objcount=0; objcount < multi; objcount++){
     
     /*set the objective function for the columns:*/
-    for(j=0; j<flag-1; j++){
-      QSchange_objcoef(lp, j, inmatrix[objcount][j]);
+    for(j=1; j<flag; j++){
+      glp_set_obj_coef(lp, j, inmatrix[objcount][j-1]);
     }
     
     
@@ -970,24 +977,27 @@ int ITIP(char **expressions, int number_expressions){
     /*	QSwrite_prob(lp, "outfile.lp", "LP");*/
     
     /*solve linear program:*/
-    outcome = QSopt_primal(lp, &status);
+    glp_init_smcp(&parm);
+    parm.msg_lev = GLP_MSG_ERR;
+    outcome = glp_simplex(lp, &parm);
     if(outcome != 0){
 /*       puts("function QSopt_primal returned an error!"); */
     }
+    status = glp_get_status(lp);
     
     /*lpx_write_cpxlp(lp, "LP.cplex");*/ /*for debugging*/
     
     /*test whether an optimal solution has been found:*/
-    if(status != QS_LP_OPTIMAL){
+    if(status != GLP_OPT){
       result = 0;
 /*       puts("no optimal solution found"); */
     }
     else{ /*if the solution is optimal, check whether it is all-zero*/
-      QSget_solution(lp, NULL, x, NULL, NULL, NULL);
-      for(i = 0; i < flag-1; i++){
-	if(x[i] != 0){
-	  result = 0;
-	}
+      // the original check was for the solution (primal variable values)
+      // rather than objective value, but let's do it simpler for now:
+      // (if an optimum is found, it should be zero anyway)
+      if (glp_get_obj_val(lp) != 0.0) {
+        result = 0;
       }
     }
     
@@ -996,8 +1006,8 @@ int ITIP(char **expressions, int number_expressions){
       /*check whether a second test is necessary (this is the case if we have to check for equality)*/
       if(intype[0] == 0){
 	/*change the objective function in the LPX object:*/
-	for(j=0; j<flag-1; j++){
-	  QSchange_objcoef(lp, j, - inmatrix[objcount][j]);
+	for(j=1; j<flag; j++){
+      glp_set_obj_coef(lp, j, - inmatrix[objcount][j-1]);
 	}
 	
 	/*debug: write problem to file*/
@@ -1005,24 +1015,22 @@ int ITIP(char **expressions, int number_expressions){
 	
 	
 	/*solve linear program:*/
-	outcome = QSopt_primal(lp, &status);
+    outcome = glp_simplex(lp, &parm);
 	if(outcome != 0){
 /* 	  puts("function QSopt_primal returned an error!"); */
 	}
+    status = glp_get_status(lp);
 	
 	/*lpx_write_cpxlp(lp, "LP.cplex");*/ /*for debugging*/
 	
 	/*test whether an optimal solution has been found:*/
-	if(status != QS_LP_OPTIMAL){
+	if(status != GLP_OPT){
 	  result = 0;
 	}
 	else{  /*if the solution is optimal, check whether it is all-zero*/
-	  QSget_solution(lp, NULL, x, NULL, NULL, NULL);
-	  for(i = 0; i < flag-1; i++){
-	    if(x[i] != 0){
-	      result = 0;
-	    }
-	  }
+      if (glp_get_obj_val(lp) != 0.0) {
+        result = 0;
+      }
 	}
       }
     }
@@ -1040,7 +1048,7 @@ int ITIP(char **expressions, int number_expressions){
   free(row_indices);
   free(row_values);
   free(x);
-  QSfree_prob(lp);
+  glp_delete_prob(lp);
   for(i=0; i<numofinput+extrainput; i++){
     free(inmatrix[i]);
   }

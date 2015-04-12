@@ -5,10 +5,6 @@ Citip
 ITIP.c
 itip.c
 
-# External library header with non-free license
-qsopt.h
-
-
 # The following section is taken from the file 'C++.gitignore' in
 # https://github.com/github/gitignore/blob/master/ - commit 62d6528:
 
