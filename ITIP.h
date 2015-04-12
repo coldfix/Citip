@@ -52,18 +52,18 @@
 
 int ITIP(char **expressions, int number_expressions);
 
-char argnumber,status,itype,macrodetect ;
-int numofinput,extrainput,multi ;
+char argnumber,status,itype,macrodetect;
+int numofinput,extrainput,multi;
 
-char buffer[255],ncount,fcount,vcount,condflag ;
-long int field[250],attribute,attrib[26],flag ;
+char buffer[255],ncount,fcount,vcount,condflag;
+long int field[250],attribute,attrib[26],flag;
 
-char rvnames[26][27],rvnames2[26][27],name[60] ;
+char rvnames[26][27],rvnames2[26][27],name[60];
 
-long int rvtag[26] ;
-int rvtotal ;
-long int tagmask ;
+long int rvtag[26];
+int rvtotal;
+long int tagmask;
 
-double number,*nptr ;
-int c,offset ;
-int delimiters[30], limcount ;
+double number,*nptr;
+int c,offset;
+int delimiters[30], limcount;

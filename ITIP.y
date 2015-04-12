@@ -77,36 +77,36 @@
 #include <glpk.h>
 #include "make_D.h"
 
-char argnumber,status,itype,macrodetect ;
-int numofinput,extrainput,multi,objcount;
+char argnumber, status, itype, macrodetect;
+int numofinput, extrainput, multi, objcount;
 
-char *input,buffer[255],ncount,fcount,vcount,condflag ;
-long int field[250],attribute,attrib[52],flag ;  /* Ratna : 26*2 to have
+char *input, buffer[255], ncount, fcount, vcount, condflag;
+long int field[250], attribute, attrib[52], flag;  /* Ratna : 26*2 to have
 small letter English alphabet as random variables*/
 
-char rvnames[52][27],rvnames2[52][27],name[60] ; // 26*2 x 2 dimension seems to be enough (Ratna)
+char rvnames[52][27], rvnames2[52][27], name[60]; // 26*2 x 2 dimension seems to be enough (Ratna)
 
-long int rvtag[52] ;
-int rvtotal ;
-long int tagmask ;
+long int rvtag[52];
+int rvtotal;
+long int tagmask;
 
-double number,*nptr ;
-int c,offset ;
+double number, *nptr;
+int c, offset;
 struct EQN
 {
-    double coef ;
-    long int variable ;
-    struct EQN *next ;
-} *eqn, *current, *boundary ;
+    double coef;
+    long int variable;
+    struct EQN *next;
+} *eqn, *current, *boundary;
 
 struct EQNLIST
 {
-    struct EQN *eqn ;
-    int argtype ;
-    struct EQNLIST *next ;
-} *arghead, *arglist ;
+    struct EQN *eqn;
+    int argtype;
+    struct EQNLIST *next;
+} *arghead, *arglist;
 
-int delimiters[30], limcount ;
+int delimiters[30], limcount;
 %}
 %start lines
 %%
@@ -160,162 +160,162 @@ eq  : expr '=' _TMP '0' {arglist->argtype=0;}
 _TMP    : /* empty */ {boundary=current;}
     ;
 
-rv  : 'A' {if(attrib[0])    attribute=attrib[0] ;
-                else        {attribute=flag;attrib[0]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='A';}}
-    | 'B' {if(attrib[1])    attribute=attrib[1] ;
-                else        {attribute=flag;attrib[1]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='B';}}
-    | 'C' {if(attrib[2])    attribute=attrib[2] ;
-                else        {attribute=flag;attrib[2]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='C';}}
-    | 'D' {if(attrib[3])    attribute=attrib[3] ;
-                else        {attribute=flag;attrib[3]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='D';}}
-    | 'E' {if(attrib[4])    attribute=attrib[4] ;
-                else        {attribute=flag;attrib[4]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='E';}}
-    | 'F' {if(attrib[5])    attribute=attrib[5] ;
-                else        {attribute=flag;attrib[5]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='F';}}
-    | 'G' {if(attrib[6])    attribute=attrib[6] ;
-                else        {attribute=flag;attrib[6]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='G';}}
-    | 'H' {if(attrib[7])    attribute=attrib[7] ;
-                else        {attribute=flag;attrib[7]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='H';}}
-    | 'I' {if(attrib[8])    attribute=attrib[8] ;
-                else        {attribute=flag;attrib[8]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='I';}}
-    | 'J' {if(attrib[9])    attribute=attrib[9] ;
-                else        {attribute=flag;attrib[9]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='J';}}
-    | 'K' {if(attrib[10])    attribute=attrib[10] ;
-                else        {attribute=flag;attrib[10]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='K';}}
-    | 'L' {if(attrib[11])    attribute=attrib[11] ;
-                else        {attribute=flag;attrib[11]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='L';}}
-    | 'M' {if(attrib[12])    attribute=attrib[12] ;
-                else        {attribute=flag;attrib[12]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='M';}}
-    | 'N' {if(attrib[13])    attribute=attrib[13] ;
-                else        {attribute=flag;attrib[13]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='N';}}
-    | 'O' {if(attrib[14])    attribute=attrib[14] ;
-                else        {attribute=flag;attrib[14]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='O';}}
-    | 'P' {if(attrib[15])    attribute=attrib[15] ;
-                else        {attribute=flag;attrib[15]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='P';}}
-    | 'Q' {if(attrib[16])    attribute=attrib[16] ;
-                else        {attribute=flag;attrib[16]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='Q';}}
-    | 'R' {if(attrib[17])    attribute=attrib[17] ;
-                else        {attribute=flag;attrib[17]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='R';}}
-    | 'S' {if(attrib[18])    attribute=attrib[18] ;
-                else        {attribute=flag;attrib[18]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='S';}}
-    | 'T' {if(attrib[19])    attribute=attrib[19] ;
-                else        {attribute=flag;attrib[19]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='T';}}
-    | 'U' {if(attrib[20])    attribute=attrib[20] ;
-                else        {attribute=flag;attrib[20]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='U';}}
-    | 'V' {if(attrib[21])    attribute=attrib[21] ;
-                else        {attribute=flag;attrib[21]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='V';}}
-    | 'W' {if(attrib[22])    attribute=attrib[22] ;
-                else        {attribute=flag;attrib[22]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='W';}}
-    | 'X' {if(attrib[23])    attribute=attrib[23] ;
-                else        {attribute=flag;attrib[23]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='X';}}
-    | 'Y' {if(attrib[24])    attribute=attrib[24] ;
-                else        {attribute=flag;attrib[24]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='Y';}}
-    | 'Z' {if(attrib[25])    attribute=attrib[25] ;
-                else        {attribute=flag;attrib[25]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='Z';}}
-    | 'a' {if(attrib[26])    attribute=attrib[26] ;
-                else        {attribute=flag;attrib[26]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='a';}}
-    | 'b' {if(attrib[27])    attribute=attrib[27] ;
-                else        {attribute=flag;attrib[27]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='b';}}
-    | 'c' {if(attrib[28])    attribute=attrib[28] ;
-                else        {attribute=flag;attrib[28]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='c';}}
-    | 'd' {if(attrib[29])    attribute=attrib[29] ;
-                else        {attribute=flag;attrib[29]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='d';}}
-    | 'e' {if(attrib[30])    attribute=attrib[30] ;
-                else        {attribute=flag;attrib[30]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='e';}}
-    | 'f' {if(attrib[31])    attribute=attrib[31] ;
-                else        {attribute=flag;attrib[31]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='f';}}
-    | 'g' {if(attrib[32])    attribute=attrib[32] ;
-                else        {attribute=flag;attrib[32]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='g';}}
-    | 'h' {if(attrib[33])    attribute=attrib[33] ;
-                else        {attribute=flag;attrib[33]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='h';}}
-    | 'i' {if(attrib[34])    attribute=attrib[34] ;
-                else        {attribute=flag;attrib[34]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='i';}}
-    | 'j' {if(attrib[35])    attribute=attrib[35] ;
-                else        {attribute=flag;attrib[35]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='j';}}
-    | 'k' {if(attrib[36])    attribute=attrib[36] ;
-                else        {attribute=flag;attrib[36]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='k';}}
-    | 'l' {if(attrib[37])    attribute=attrib[37] ;
-                else        {attribute=flag;attrib[37]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='l';}}
-    | 'm' {if(attrib[38])    attribute=attrib[38] ;
-                else        {attribute=flag;attrib[38]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='m';}}
-    | 'n' {if(attrib[39])    attribute=attrib[39] ;
-                else        {attribute=flag;attrib[39]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='n';}}
-    | 'o' {if(attrib[40])    attribute=attrib[40] ;
-                else        {attribute=flag;attrib[40]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='o';}}
-    | 'p' {if(attrib[41])    attribute=attrib[41] ;
-                else        {attribute=flag;attrib[41]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='p';}}
-    | 'q' {if(attrib[42])    attribute=attrib[42] ;
-                else        {attribute=flag;attrib[42]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='q';}}
-    | 'r' {if(attrib[43])    attribute=attrib[43] ;
-                else        {attribute=flag;attrib[43]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='r';}}
-    | 's' {if(attrib[44])    attribute=attrib[44] ;
-                else        {attribute=flag;attrib[44]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='s';}}
-    | 't' {if(attrib[45])    attribute=attrib[45] ;
-                else        {attribute=flag;attrib[45]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='t';}}
-    | 'u' {if(attrib[46])    attribute=attrib[46] ;
-                else        {attribute=flag;attrib[46]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='u';}}
-    | 'v' {if(attrib[47])    attribute=attrib[47] ;
-                else        {attribute=flag;attrib[47]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='v';}}
-    | 'w' {if(attrib[48])    attribute=attrib[48] ;
-                else        {attribute=flag;attrib[48]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='w';}}
-    | 'x' {if(attrib[49])    attribute=attrib[49] ;
-                else        {attribute=flag;attrib[49]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='x';}}
-    | 'y' {if(attrib[50])    attribute=attrib[50] ;
-                else        {attribute=flag;attrib[50]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='y';}}
-    | 'z' {if(attrib[51])    attribute=attrib[51] ;
-                else        {attribute=flag;attrib[51]=flag;flag=flag<<1;
-                 rvnames[vcount++][0]='z';}}
+rv  : 'A' {if (attrib[0])    attribute=attrib[0];
+                else        {attribute=flag; attrib[0]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='A'; }}
+    | 'B' {if (attrib[1])    attribute=attrib[1];
+                else        {attribute=flag; attrib[1]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='B'; }}
+    | 'C' {if (attrib[2])    attribute=attrib[2];
+                else        {attribute=flag; attrib[2]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='C'; }}
+    | 'D' {if (attrib[3])    attribute=attrib[3];
+                else        {attribute=flag; attrib[3]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='D'; }}
+    | 'E' {if (attrib[4])    attribute=attrib[4];
+                else        {attribute=flag; attrib[4]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='E'; }}
+    | 'F' {if (attrib[5])    attribute=attrib[5];
+                else        {attribute=flag; attrib[5]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='F'; }}
+    | 'G' {if (attrib[6])    attribute=attrib[6];
+                else        {attribute=flag; attrib[6]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='G'; }}
+    | 'H' {if (attrib[7])    attribute=attrib[7];
+                else        {attribute=flag; attrib[7]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='H'; }}
+    | 'I' {if (attrib[8])    attribute=attrib[8];
+                else        {attribute=flag; attrib[8]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='I'; }}
+    | 'J' {if (attrib[9])    attribute=attrib[9];
+                else        {attribute=flag; attrib[9]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='J'; }}
+    | 'K' {if (attrib[10])    attribute=attrib[10];
+                else        {attribute=flag; attrib[10]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='K'; }}
+    | 'L' {if (attrib[11])    attribute=attrib[11];
+                else        {attribute=flag; attrib[11]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='L'; }}
+    | 'M' {if (attrib[12])    attribute=attrib[12];
+                else        {attribute=flag; attrib[12]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='M'; }}
+    | 'N' {if (attrib[13])    attribute=attrib[13];
+                else        {attribute=flag; attrib[13]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='N'; }}
+    | 'O' {if (attrib[14])    attribute=attrib[14];
+                else        {attribute=flag; attrib[14]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='O'; }}
+    | 'P' {if (attrib[15])    attribute=attrib[15];
+                else        {attribute=flag; attrib[15]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='P'; }}
+    | 'Q' {if (attrib[16])    attribute=attrib[16];
+                else        {attribute=flag; attrib[16]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='Q'; }}
+    | 'R' {if (attrib[17])    attribute=attrib[17];
+                else        {attribute=flag; attrib[17]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='R'; }}
+    | 'S' {if (attrib[18])    attribute=attrib[18];
+                else        {attribute=flag; attrib[18]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='S'; }}
+    | 'T' {if (attrib[19])    attribute=attrib[19];
+                else        {attribute=flag; attrib[19]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='T'; }}
+    | 'U' {if (attrib[20])    attribute=attrib[20];
+                else        {attribute=flag; attrib[20]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='U'; }}
+    | 'V' {if (attrib[21])    attribute=attrib[21];
+                else        {attribute=flag; attrib[21]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='V'; }}
+    | 'W' {if (attrib[22])    attribute=attrib[22];
+                else        {attribute=flag; attrib[22]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='W'; }}
+    | 'X' {if (attrib[23])    attribute=attrib[23];
+                else        {attribute=flag; attrib[23]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='X'; }}
+    | 'Y' {if (attrib[24])    attribute=attrib[24];
+                else        {attribute=flag; attrib[24]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='Y'; }}
+    | 'Z' {if (attrib[25])    attribute=attrib[25];
+                else        {attribute=flag; attrib[25]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='Z'; }}
+    | 'a' {if (attrib[26])    attribute=attrib[26];
+                else        {attribute=flag; attrib[26]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='a'; }}
+    | 'b' {if (attrib[27])    attribute=attrib[27];
+                else        {attribute=flag; attrib[27]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='b'; }}
+    | 'c' {if (attrib[28])    attribute=attrib[28];
+                else        {attribute=flag; attrib[28]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='c'; }}
+    | 'd' {if (attrib[29])    attribute=attrib[29];
+                else        {attribute=flag; attrib[29]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='d'; }}
+    | 'e' {if (attrib[30])    attribute=attrib[30];
+                else        {attribute=flag; attrib[30]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='e'; }}
+    | 'f' {if (attrib[31])    attribute=attrib[31];
+                else        {attribute=flag; attrib[31]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='f'; }}
+    | 'g' {if (attrib[32])    attribute=attrib[32];
+                else        {attribute=flag; attrib[32]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='g'; }}
+    | 'h' {if (attrib[33])    attribute=attrib[33];
+                else        {attribute=flag; attrib[33]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='h'; }}
+    | 'i' {if (attrib[34])    attribute=attrib[34];
+                else        {attribute=flag; attrib[34]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='i'; }}
+    | 'j' {if (attrib[35])    attribute=attrib[35];
+                else        {attribute=flag; attrib[35]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='j'; }}
+    | 'k' {if (attrib[36])    attribute=attrib[36];
+                else        {attribute=flag; attrib[36]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='k'; }}
+    | 'l' {if (attrib[37])    attribute=attrib[37];
+                else        {attribute=flag; attrib[37]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='l'; }}
+    | 'm' {if (attrib[38])    attribute=attrib[38];
+                else        {attribute=flag; attrib[38]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='m'; }}
+    | 'n' {if (attrib[39])    attribute=attrib[39];
+                else        {attribute=flag; attrib[39]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='n'; }}
+    | 'o' {if (attrib[40])    attribute=attrib[40];
+                else        {attribute=flag; attrib[40]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='o'; }}
+    | 'p' {if (attrib[41])    attribute=attrib[41];
+                else        {attribute=flag; attrib[41]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='p'; }}
+    | 'q' {if (attrib[42])    attribute=attrib[42];
+                else        {attribute=flag; attrib[42]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='q'; }}
+    | 'r' {if (attrib[43])    attribute=attrib[43];
+                else        {attribute=flag; attrib[43]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='r'; }}
+    | 's' {if (attrib[44])    attribute=attrib[44];
+                else        {attribute=flag; attrib[44]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='s'; }}
+    | 't' {if (attrib[45])    attribute=attrib[45];
+                else        {attribute=flag; attrib[45]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='t'; }}
+    | 'u' {if (attrib[46])    attribute=attrib[46];
+                else        {attribute=flag; attrib[46]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='u'; }}
+    | 'v' {if (attrib[47])    attribute=attrib[47];
+                else        {attribute=flag; attrib[47]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='v'; }}
+    | 'w' {if (attrib[48])    attribute=attrib[48];
+                else        {attribute=flag; attrib[48]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='w'; }}
+    | 'x' {if (attrib[49])    attribute=attrib[49];
+                else        {attribute=flag; attrib[49]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='x'; }}
+    | 'y' {if (attrib[50])    attribute=attrib[50];
+                else        {attribute=flag; attrib[50]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='y'; }}
+    | 'z' {if (attrib[51])    attribute=attrib[51];
+                else        {attribute=flag; attrib[51]=flag; flag=flag<<1;
+                 rvnames[vcount++][0]='z'; }}
         ;
 
 rvlist  : rv {field[fcount]=attribute;}
@@ -353,361 +353,361 @@ _MAC2   : /* empty */ {delimiters[limcount++]=c;}
 %%
 void expandmacro1()
 {
-    char temp[2048] ;
-    input[delimiters[0]-1] = '|' ;
-    temp[0] = 'H' ;
-    temp[1] = '(' ;
-    temp[2] = '\0' ;
-    strcat(temp,input) ;
-    strcat(temp,")=0") ;
-    strcpy(input,temp) ;
-    c = 0 ;
-    yyparse() ;
+    char temp[2048];
+    input[delimiters[0]-1] = '|';
+    temp[0] = 'H';
+    temp[1] = '(';
+    temp[2] = '\0';
+    strcat(temp, input);
+    strcat(temp, ")=0");
+    strcpy(input, temp);
+    c = 0;
+    yyparse();
 }
 
 void expandmacro2()
 {
-    char temp[2048] ;
-    int l, j ;
-    for(l=0;l<limcount;l++)
-        input[delimiters[l]-1] = ' ' ;
-    temp[0] = 'H' ;
-    temp[1] = '(' ;
-    temp[2] = '\0' ;
-    strcat(temp,input) ;
-    strcat(temp,")=H(") ;
-    for(l=0,j=0;l<limcount;l++)
+    char temp[2048];
+    int l, j;
+    for (l = 0; l < limcount; l++)
+        input[delimiters[l]-1] = ' ';
+    temp[0] = 'H';
+    temp[1] = '(';
+    temp[2] = '\0';
+    strcat(temp, input);
+    strcat(temp, ")=H(");
+    for (l = 0, j = 0; l < limcount; l++)
     {
-        input[delimiters[l]-1] = '\0' ;
-        strcat(temp,input+j) ;
-        strcat(temp,")+H(") ;
-        j = delimiters[l] ;
+        input[delimiters[l]-1] = '\0';
+        strcat(temp, input+j);
+        strcat(temp, ")+H(");
+        j = delimiters[l];
     }
-    strcat(temp,input+j) ;
-    strcat(temp,")") ;
-    strcpy(input,temp) ;
-    c = 0 ;
-    yyparse() ;
+    strcat(temp, input+j);
+    strcat(temp, ")");
+    strcpy(input, temp);
+    c = 0;
+    yyparse();
 }
 
 void expandmacro3()
 {
-    char temp[2048], backup[2048], *p ;
-    int l, j ;
-    if(argnumber==0)
-        multi = limcount - 1 ;
+    char temp[2048], backup[2048], *p;
+    int l, j;
+    if (argnumber == 0)
+        multi = limcount - 1;
 
-    strcpy(backup,input) ;
-    for(l=0;l<limcount;l++)
-        backup[delimiters[l]-1] = '\0' ;
-    temp[0] = 'I' ;
-    temp[1] = '(' ;
-    p = temp + 2 ;
-    for(l=1;l<limcount;l++)
+    strcpy(backup, input);
+    for (l = 0; l < limcount; l++)
+        backup[delimiters[l]-1] = '\0';
+    temp[0] = 'I';
+    temp[1] = '(';
+    p = temp + 2;
+    for (l = 1; l < limcount; l++)
     {
-        *p = '\0' ;
-        strcat(p,backup) ;
-        strcat(p,";") ;
-        strcat(p,backup+delimiters[l]) ;
-        strcat(p,"|") ;
-        strcat(p,backup+delimiters[l-1]) ;
-        strcat(p,")=0") ;
+        *p = '\0';
+        strcat(p, backup);
+        strcat(p, "; ");
+        strcat(p, backup+delimiters[l]);
+        strcat(p, "|");
+        strcat(p, backup+delimiters[l-1]);
+        strcat(p, ")=0");
 
-        strcpy(input,temp) ;
-        c = 0 ;
-        yyparse() ;
+        strcpy(input, temp);
+        c = 0;
+        yyparse();
 
-        arglist->next = (struct EQNLIST *) malloc(sizeof(struct EQNLIST)) ;
-        arglist = arglist->next ;
-        arglist->next = NULL ;
+        arglist->next = (struct EQNLIST*) malloc(sizeof(struct EQNLIST));
+        arglist = arglist->next;
+        arglist->next = NULL;
 
-        if(l!=(limcount-1))
+        if (l != (limcount-1))
         {
-            arglist->eqn = (struct EQN *) malloc(sizeof(struct EQN)) ;
-            eqn = arglist->eqn ;
-            eqn->next = NULL ;
-            current = eqn ;
+            arglist->eqn = (struct EQN*) malloc(sizeof(struct EQN));
+            eqn = arglist->eqn;
+            eqn->next = NULL;
+            current = eqn;
 
-            backup[delimiters[l-1]-1] = ' ' ;
+            backup[delimiters[l-1]-1] = ' ';
         }
         else
-            arglist->eqn = NULL ;
+            arglist->eqn = NULL;
     }
 }
 
 void allocate()
 {
-    current->next = (struct EQN *) malloc(sizeof(struct EQN)) ;
-    current = current->next ;
-    current->next = NULL ;
+    current->next = (struct EQN*) malloc(sizeof(struct EQN));
+    current = current->next;
+    current->next = NULL;
 }
 
 int advance()
 {
-    char tail,i,j,p,notdone ;
-    long int mask,temp ;
-    int bptr,bcount,btemp,bfinal ;
-    tail = fcount ;
-    if(condflag)
-        tail-- ;
-    notdone = 1 ;
-    p = 0 ;
-    for(j=1;j<=tail;j++)
+    char tail, i, j, p, notdone;
+    long int mask, temp;
+    int bptr, bcount, btemp, bfinal;
+    tail = fcount;
+    if (condflag)
+        tail--;
+    notdone = 1;
+    p = 0;
+    for (j = 1; j <= tail; j++)
     {
-        for(i=0;i<=p;i++)
+        for (i = 0; i <= p; i++)
         {
-            mask = field[i] & field[j] ;
-            if(mask==field[i] || mask==field[j])
+            mask = field[i] & field[j];
+            if (mask == field[i] || mask == field[j])
             {
-                field[i] = mask ;
-                break ;
+                field[i] = mask;
+                break;
             }
         }
-        if(i>p)
-            field[++p] = field[j] ;
+        if (i > p)
+            field[++p] = field[j];
     }
 
-    if(condflag)
+    if (condflag)
     {
-        mask = ~field[fcount] ;
-        for(i=0;i<=p;i++)
+        mask = ~field[fcount];
+        for (i = 0; i <= p; i++)
         {
-            temp = field[i] & mask ;
-            if(temp)
-                field[i] = temp ;
+            temp = field[i] & mask;
+            if (temp)
+                field[i] = temp;
             else
             {
-                notdone = 0 ;
-                break ;
+                notdone = 0;
+                break;
             }
         }
     }
 
-    if(notdone)
+    if (notdone)
     {
-        if(!p)
+        if (!p)
         {
-            if(condflag)
+            if (condflag)
             {
-                current->coef = number ;
-                current->variable = field[0] | field[fcount] ;
-                allocate() ;
-                current->coef = - number ;
-                current->variable = field[fcount] ;
+                current->coef = number;
+                current->variable = field[0] | field[fcount];
+                allocate();
+                current->coef = - number;
+                current->variable = field[fcount];
             }
             else
             {
-                current->coef = number ;
-                current->variable = field[0] ;
+                current->coef = number;
+                current->variable = field[0];
             }
-            allocate() ;
+            allocate();
         }
         else
         {
-            bfinal = (1L << (p+1)) - 1 ;
-            if(condflag)
-                mask = field[fcount] ;
+            bfinal = (1L << (p+1)) - 1;
+            if (condflag)
+                mask = field[fcount];
             else
-                mask = 0 ;
+                mask = 0;
 
-            for(bcount=1;bcount<=bfinal;bcount++)
+            for (bcount = 1; bcount <= bfinal; bcount++)
             {
-                btemp = (bcount & 0xFFFF) ^ (bcount >> 16) ;
-                btemp = (btemp & 0xFF) ^ (btemp >> 8) ;
-                btemp = (btemp & 0xF) ^ (btemp >> 4) ;
-                btemp = (btemp & 0x3) ^ (btemp >> 2) ;
-                btemp = (btemp & 0x1) ^ (btemp >> 1) ;
+                btemp = (bcount & 0xFFFF) ^ (bcount >> 16);
+                btemp = (btemp & 0xFF) ^ (btemp >> 8);
+                btemp = (btemp & 0xF) ^ (btemp >> 4);
+                btemp = (btemp & 0x3) ^ (btemp >> 2);
+                btemp = (btemp & 0x1) ^ (btemp >> 1);
 
-                temp = mask ;
-                for(bptr=0;bptr<=p;bptr++)
-                    if(bcount & (1L << bptr))
-                        temp |= field[bptr] ;
+                temp = mask;
+                for (bptr = 0; bptr <= p; bptr++)
+                    if (bcount & (1L << bptr))
+                        temp |= field[bptr];
 
-                if(btemp)
-                    current->coef = number ;
+                if (btemp)
+                    current->coef = number;
                 else
-                    current->coef = - number ;
-                current->variable = temp ;
+                    current->coef = - number;
+                current->variable = temp;
 
-                allocate() ;
+                allocate();
             }
 
-            if(condflag)
+            if (condflag)
             {
-                current->coef = - number ;
-                current->variable = mask ;
-                allocate() ;
+                current->coef = - number;
+                current->variable = mask;
+                allocate();
             }
         }
     }
 
-    fcount = 0 ;
+    fcount = 0;
     return 1;
 }
 
 int negate1()
 {
-    current = eqn ;
-    while(current!=boundary)
+    current = eqn;
+    while (current != boundary)
     {
-        current->coef = - current->coef ;
-        current = current->next ;
+        current->coef = - current->coef;
+        current = current->next;
     }
     return 1;
 }
 
 int negate2()
 {
-    current = boundary ;
-    while(current->next!=NULL)
+    current = boundary;
+    while (current->next != NULL)
     {
-        current->coef= -current->coef ;
-        current=current->next ;
+        current->coef= -current->coef;
+        current = current->next;
     }
     return 1;
 }
 
 void free_eqn()
 {
-    struct EQN *temp ;
-    int count ;
+    struct EQN *temp;
+    int count;
 
-    arglist = arghead ;
-    while(arglist!=NULL)
+    arglist = arghead;
+    while (arglist != NULL)
     {
-        current = arglist->eqn ;
-        while(current!=NULL)
+        current = arglist->eqn;
+        while (current != NULL)
         {
-            temp = current->next ;
-            free(current) ;
-            current = temp ;
+            temp = current->next;
+            free(current);
+            current = temp;
         }
-        arghead = arglist ;
-        arglist = arglist->next ;
-        free(arghead) ;
+        arghead = arglist;
+        arglist = arglist->next;
+        free(arghead);
     }
 }
 
 void new_rv(long tag)
 {
-    int index, oldtotal ;
-    long part0, part1, part2 ;
-    if(tag & tagmask)
+    int index, oldtotal;
+    long part0, part1, part2;
+    if (tag & tagmask)
     {
-        tagmask = tagmask | tag ;
-        oldtotal = rvtotal ;
-        index = 0 ;
-        while(tag)
+        tagmask = tagmask | tag;
+        oldtotal = rvtotal;
+        index = 0;
+        while (tag)
         {
-            if(index==oldtotal)
+            if (index == oldtotal)
             {
-                rvtag[rvtotal++] = tag ;
-                tag = 0 ;
+                rvtag[rvtotal++] = tag;
+                tag = 0;
             }
             else
             {
-                part0 = rvtag[index] & tag ;
-                if(part0)
+                part0 = rvtag[index] & tag;
+                if (part0)
                 {
-                    part1 = rvtag[index] & (~tag) ;
-                    part2 = (~rvtag[index]) & tag ;
+                    part1 = rvtag[index] & (~tag);
+                    part2 = (~rvtag[index]) & tag;
 
-                    rvtag[index++] = part0 ;
-                    if(part1)
-                        rvtag[rvtotal++] = part1 ;
-                    tag = part2 ;
+                    rvtag[index++] = part0;
+                    if (part1)
+                        rvtag[rvtotal++] = part1;
+                    tag = part2;
                 }
                 else
-                    index++ ;
+                    index++;
             }
         }
     }
     else
     {
-        tagmask = tagmask | tag ;
-        rvtag[rvtotal++] = tag ;
+        tagmask = tagmask | tag;
+        rvtag[rvtotal++] = tag;
     }
 }
 
 void reduce_rv()
 {
-    current = eqn ;
-    while(current->next!=NULL)
+    current = eqn;
+    while (current->next != NULL)
     {
-        new_rv(current->variable) ;
-        current=current->next ;
+        new_rv(current->variable);
+        current = current->next;
     }
 }
 
 void split_rv(long int *p)
 {
-    int index ;
-    long int current_bit, temp, output ;
+    int index;
+    long int current_bit, temp, output;
 
-    temp = *p ;
-    output = 0 ;
+    temp = *p;
+    output = 0;
 
-    for(index=0,current_bit=1;index<rvtotal;index++,current_bit<<=1)
-        if(temp & rvtag[index])
+    for (index = 0, current_bit = 1; index < rvtotal; index++, current_bit <<= 1)
+        if (temp & rvtag[index])
         {
-            output = output | current_bit ;
-            temp = temp & (~rvtag[index]) ;
+            output = output | current_bit;
+            temp = temp & (~rvtag[index]);
         }
 
-    *p = output ;
+    *p = output;
 }
 
 void map_rv()
 {
-    current = eqn ;
-    while(current->next!=NULL)
+    current = eqn;
+    while (current->next != NULL)
     {
-        split_rv(&(current->variable)) ;
-        current=current->next ;
+        split_rv(&(current->variable));
+        current = current->next;
     }
 }
 
 void expand(double *coef)
 {
-    current = eqn ;
-    while(current->next!=NULL)
+    current = eqn;
+    while (current->next != NULL)
     {
-        coef[current->variable - 1] += current->coef ;
-        current=current->next ;
+        coef[current->variable - 1] += current->coef;
+        current = current->next;
     }
 }
 
 int yylex()
 {
-    while(input[c]==' ')
-        c++ ;
-    return(input[c++]) ;
+    while (input[c] == ' ')
+        c++;
+    return(input[c++]);
 }
 
 int yyerror(char *s)
 {
-    struct EQN *temp ;
-    free_eqn() ;
-    status = 1 ;
-    return(-1) ;
+    struct EQN *temp;
+    free_eqn();
+    status = 1;
+    return(-1);
 }
 
 
 void testoutput(double **inmatrix, int *intype, int multi, int numberequations, int numbervars)
 {
-    int i,j;
+    int i, j;
 
     puts("inmatrix:");
-    for(i=0; i<numberequations; i++){
-        for(j=0; j<numbervars; j++){
-            printf("%d\t", (int)inmatrix[i][j]);
+    for (i = 0; i < numberequations; i++) {
+        for (j = 0; j < numbervars; j++) {
+            printf("%d\t", (int) inmatrix[i][j]);
         }
         printf("\n");
     }
 
     puts("");
     puts("intype:");
-    for(i=0; i<numberequations; i++){
+    for (i = 0; i < numberequations; i++) {
         printf("%d\t", intype[i]);
     }
 
@@ -717,12 +717,12 @@ void testoutput(double **inmatrix, int *intype, int multi, int numberequations, 
 }
 
 
-int ITIP(char **expressions, int number_expressions){
+int ITIP(char **expressions, int number_expressions) {
     int temp;
     long b;
     int *intype;
     double **inmatrix;
-    int i,j;
+    int i, j;
     glp_prob* lp;
     int row_length;
     int *row_indices;
@@ -732,16 +732,16 @@ int ITIP(char **expressions, int number_expressions){
     int row, col;
     glp_smcp parm;
 
-    for(temp=0;temp<52;temp++){
-        attrib[temp] = 0 ;
-        rvnames[temp][1] = '\0' ;
+    for (temp = 0; temp < 52; temp++) {
+        attrib[temp] = 0;
+        rvnames[temp][1] = '\0';
     }
 
-    flag = 1 ;
-    vcount = 0 ;
-    status = 0 ;
-    extrainput = 0 ;
-    multi = 1 ;
+    flag = 1;
+    vcount = 0;
+    status = 0;
+    extrainput = 0;
+    multi = 1;
     /*
       multi tells us how many objective functions there are.
       The objective function is always the first input string.
@@ -750,137 +750,137 @@ int ITIP(char **expressions, int number_expressions){
       be expressed using a single objective function.
     */
 
-    arghead = (struct EQNLIST *) malloc(sizeof(struct EQNLIST)) ;
-    arglist = arghead ;
-    arglist->eqn = NULL ;
-    arglist->next = NULL ;
+    arghead = (struct EQNLIST*) malloc(sizeof(struct EQNLIST));
+    arglist = arghead;
+    arglist->eqn = NULL;
+    arglist->next = NULL;
 
-    input = (char *)malloc(1000*sizeof(char));
+    input = (char*) malloc(1000*sizeof(char));
 
     /* parse the expressions one by one: */
-    for(argnumber=0; argnumber<number_expressions; argnumber++){
-        ncount = 0 ;
-        fcount = 0 ;
-        c = 0 ;
+    for (argnumber = 0; argnumber < number_expressions; argnumber++) {
+        ncount = 0;
+        fcount = 0;
+        c = 0;
 
-        if(strlen(expressions[argnumber]) >= 900){
+        if (strlen(expressions[argnumber]) >= 900) {
             input = realloc(input, 2*strlen(expressions[argnumber])*sizeof(char));
         }
         strcpy(input, expressions[argnumber]);
 
-        arglist->eqn = (struct EQN *) malloc(sizeof(struct EQN)) ;
-        eqn = arglist->eqn ;
-        eqn->next = NULL ;
-        current = eqn ;
-        macrodetect = 0 ;
-        if(yyparse())
+        arglist->eqn = (struct EQN*) malloc(sizeof(struct EQN));
+        eqn = arglist->eqn;
+        eqn->next = NULL;
+        current = eqn;
+        macrodetect = 0;
+        if (yyparse())
         {
             return (-2-argnumber);  // syntax error in expression
         }
 
 
-        if(status){
-            free_eqn() ;
+        if (status) {
+            free_eqn();
             free(input);
             return 20; /* any value larger than 6 will lead to an "unexpected error" message */
         }
         switch(macrodetect)
         {
-            case 1: expandmacro1() ; break ;
-            case 2: expandmacro2() ; break ;
-            case 3: expandmacro3() ;
+            case 1: expandmacro1(); break;
+            case 2: expandmacro2(); break;
+            case 3: expandmacro3();
         }
 
 
-        if(macrodetect!=3)
+        if (macrodetect != 3)
         {
-            arglist->next = (struct EQNLIST *) malloc(sizeof(struct EQNLIST)) ;
-            arglist = arglist->next ;
-            arglist->eqn = NULL ;
-            arglist->next = NULL ;
+            arglist->next = (struct EQNLIST*) malloc(sizeof(struct EQNLIST));
+            arglist = arglist->next;
+            arglist->eqn = NULL;
+            arglist->next = NULL;
         }
     }
     numofinput = argnumber;
     /*end of file-reading and parsing*/
 
     /*always do optimization (collapses variables that always appear together)*/
-    rvtotal = 0 ;
-    tagmask = 0 ;
-    arglist = arghead ;
-    while(arglist!=NULL) {
-        if(arglist->eqn!=NULL)
+    rvtotal = 0;
+    tagmask = 0;
+    arglist = arghead;
+    while (arglist != NULL) {
+        if (arglist->eqn != NULL)
         {
-            eqn = arglist->eqn ;
-            reduce_rv() ;
+            eqn = arglist->eqn;
+            reduce_rv();
         }
-        arglist = arglist->next ;
+        arglist = arglist->next;
     }
 
-    if(flag > 1L<<rvtotal) {
-        arglist = arghead ;
-        while(arglist!=NULL) {
-            if(arglist->eqn!=NULL)
+    if (flag > 1L<<rvtotal) {
+        arglist = arghead;
+        while (arglist != NULL) {
+            if (arglist->eqn != NULL)
             {
-                eqn = arglist->eqn ;
-                map_rv() ;
+                eqn = arglist->eqn;
+                map_rv();
             }
-            arglist = arglist->next ;
+            arglist = arglist->next;
         }
-        flag = 1L<<rvtotal ;
+        flag = 1L<<rvtotal;
     }
     /*end of optimization*/
 
     /*flag-1 is the number of dimensions in the vector representation space*/
     /*numofinput+extrainput is the number of equations*/
-    inmatrix = (double **)malloc((numofinput+extrainput)*sizeof(double *));
-    for(i=0; i < numofinput+extrainput; i++){
+    inmatrix = (double **) malloc((numofinput+extrainput)*sizeof(double*));
+    for (i = 0; i < numofinput+extrainput; i++) {
         /*inmatrix contains the vector representation of one equation in each row*/
-        inmatrix[i] = (double *)malloc((flag-1)*sizeof(double));
+        inmatrix[i] = (double*) malloc((flag-1)*sizeof(double));
         /* first set all the entries to zero:*/
-        for(j=0; j<flag-1; j++){
+        for (j = 0; j < flag-1; j++) {
             inmatrix[i][j] = 0;
         }
     }
 
     /*write the equations into inmatrix (one per row):*/
-    argnumber = 0 ;
-    arglist = arghead ;
-    while(arglist!=NULL)
+    argnumber = 0;
+    arglist = arghead;
+    while (arglist != NULL)
     {
-        if(arglist->eqn!=NULL)
+        if (arglist->eqn != NULL)
         {
-            eqn = arglist->eqn ;
+            eqn = arglist->eqn;
             expand(inmatrix[argnumber]);
         }
-        argnumber++ ;
-        arglist = arglist->next ;
+        argnumber++;
+        arglist = arglist->next;
     }
 
     /*in intype, we store whether the equation is an equality (==0) or an inequality (==1)*/
-    intype = (int *)malloc((numofinput+extrainput)*sizeof(int));
-    argnumber = 0 ;
-    arglist = arghead ;
-    while(arglist!=NULL)
+    intype = (int*) malloc((numofinput+extrainput)*sizeof(int));
+    argnumber = 0;
+    arglist = arghead;
+    while (arglist != NULL)
     {
-        if(arglist->eqn!=NULL)
-            intype[argnumber] = arglist->argtype ;
-        argnumber++ ;
-        arglist = arglist->next ;
+        if (arglist->eqn != NULL)
+            intype[argnumber] = arglist->argtype;
+        argnumber++;
+        arglist = arglist->next;
     }
 
-    free_eqn() ;
+    free_eqn();
 
-    for(b=multi;b<=numofinput+extrainput-1;b++)
-        if(intype[b])
+    for (b = multi; b <= numofinput+extrainput-1; b++)
+        if (intype[b])
         {
-            b=-1;
+            b = -1;
             break;
         }
 
-    if(b==-1)
+    if (b == -1)
     {
         // Constraints cannot be inequalities.
-        for(i=0; i<numofinput+extrainput; i++){
+        for (i = 0; i < numofinput+extrainput; i++) {
             free(inmatrix[i]);
         }
         free(inmatrix);
@@ -893,7 +893,7 @@ int ITIP(char **expressions, int number_expressions){
     /*LINEAR PROGRAMMING PART:*/
 
     /*x is here to hold the optimal solutions:*/
-    x = (double *)malloc((flag-1) * sizeof(double));
+    x = (double*) malloc((flag-1) * sizeof(double));
 
 
     /*construct the linear program object:*/
@@ -904,19 +904,19 @@ int ITIP(char **expressions, int number_expressions){
 
 
     /*add all primal variables; we do not yet set their coefficients in the objective function:*/
-    for(j=0; j<flag-1; j++){
+    for (j = 0; j < flag-1; j++) {
         col = glp_add_cols(lp, 1);
         glp_set_col_bnds(lp, col, GLP_LO, 0, NAN);
     }
 
-    row_indices = (int *)malloc((flag-1)*sizeof(int));
-    row_values = (double *)malloc((flag-1)*sizeof(double));
+    row_indices = (int*) malloc((flag-1)*sizeof(int));
+    row_values = (double*) malloc((flag-1)*sizeof(double));
     /*add all the user-provided constraints to the constraint matrix:*/
-    for(i=multi; i<numofinput+extrainput; i++){ /*numofinput+extrainput is the number of rows in inmatrix */
+    for (i = multi; i < numofinput+extrainput; i++) { /*numofinput+extrainput is the number of rows in inmatrix */
     /*starts at multi because the first multi rows of inmatrix are the objective functions*/
         row_length = 0;
-        for(j=0; j<flag-1; j++){ /*for every element in the row*/
-            if(inmatrix[i][j] != 0){
+        for (j = 0; j < flag-1; j++) { /*for every element in the row*/
+            if (inmatrix[i][j] != 0) {
                 /*append elements to lp constraint row:*/
                 row_values[row_length] = inmatrix[i][j];
                 row_indices[row_length] = j+1;
@@ -925,7 +925,7 @@ int ITIP(char **expressions, int number_expressions){
             /* else (if inmatrix[i][j] is zero), do nothing */
         }
         /*decide whether the current row is an equality or an inequality:*/
-        if(intype[i] == 1){ /*if the row is an inequality*/
+        if (intype[i] == 1) { /*if the row is an inequality*/
             row_sense = GLP_UP;
         }
         else{ /*if the row is an equality*/
@@ -937,14 +937,14 @@ int ITIP(char **expressions, int number_expressions){
     }
 
     /*add all the Shannon-type constraints:*/
-    make_D(lp,rvtotal);
+    make_D(lp, rvtotal);
 
 
     /*for every objective function, we check the following:*/
-    for(objcount=0; objcount < multi; objcount++){
+    for (objcount = 0; objcount < multi; objcount++) {
 
         /*set the objective function for the columns:*/
-        for(j=1; j<flag; j++){
+        for (j = 1; j < flag; j++) {
             glp_set_obj_coef(lp, j, inmatrix[objcount][j-1]);
         }
 
@@ -952,13 +952,13 @@ int ITIP(char **expressions, int number_expressions){
         glp_init_smcp(&parm);
         parm.msg_lev = GLP_MSG_ERR;
         outcome = glp_simplex(lp, &parm);
-        if(outcome != 0){
+        if (outcome != 0) {
             // TODO: return error
         }
         status = glp_get_status(lp);
 
         /*test whether an optimal solution has been found:*/
-        if(status != GLP_OPT){
+        if (status != GLP_OPT) {
             result = 0;
         }
         else{ /*if the solution is optimal, check whether it is all-zero*/
@@ -971,23 +971,23 @@ int ITIP(char **expressions, int number_expressions){
         }
 
         /*if this first test was positive:*/
-        if(result == 1){
+        if (result == 1) {
             /*check whether a second test is necessary (this is the case if we have to check for equality)*/
-            if(intype[0] == 0){
+            if (intype[0] == 0) {
                 /*change the objective function in the LPX object:*/
-                for(j=1; j<flag; j++){
+                for (j = 1; j < flag; j++) {
                     glp_set_obj_coef(lp, j, - inmatrix[objcount][j-1]);
                 }
 
                 /*solve linear program:*/
                 outcome = glp_simplex(lp, &parm);
-                if(outcome != 0){
+                if (outcome != 0) {
                 /*    puts("function QSopt_primal returned an error!"); */
                 }
                 status = glp_get_status(lp);
 
                 /*test whether an optimal solution has been found:*/
-                if(status != GLP_OPT){
+                if (status != GLP_OPT) {
                     result = 0;
                 }
                 else{  /*if the solution is optimal, check whether it is all-zero*/
@@ -1004,7 +1004,7 @@ int ITIP(char **expressions, int number_expressions){
     free(row_values);
     free(x);
     glp_delete_prob(lp);
-    for(i=0; i<numofinput+extrainput; i++){
+    for (i = 0; i < numofinput+extrainput; i++) {
         free(inmatrix[i]);
     }
     free(inmatrix);

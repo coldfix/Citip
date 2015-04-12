@@ -60,7 +60,7 @@ struct doc_words
     struct doc_words *next;
 };
 
-struct doc_words *head=NULL;;
+struct doc_words *head = NULL;
 int i;
 int word_error = 0;
 
@@ -68,7 +68,7 @@ struct doc_words *getmem()
 {
     struct doc_words *p;
     p = malloc(sizeof(struct doc_words));
-    if(!p)
+    if (!p)
     {
         // out of memory
         return(0);
@@ -77,28 +77,28 @@ struct doc_words *getmem()
         return(p);
 }
 
-int FindWords(char *text){
+int FindWords(char *text) {
     /* return the index of the text in the list if text is already present
        in the dictionary. Otherwise, return -1.
      */
     struct doc_words *Dictionary;
-    int found=0;
-    int iIndex=0;
-    Dictionary=head; //Take the updated dictionary and call it "Dictionary "
+    int found = 0;
+    int iIndex = 0;
+    Dictionary = head; //Take the updated dictionary and call it "Dictionary "
     while ((Dictionary != NULL) && !found) { //If non empty and if no match found yet
         if (!strcmp(Dictionary->words, text)) { //If a match is found
             found = 1;       // Flag that a match has been found in the dictionary
-            iIndex=Dictionary->index;// Index of the matching word in dictionary
+            iIndex = Dictionary->index; // Index of the matching word in dictionary
         }
         else {                                 // If no match found yet, try next element
             Dictionary = Dictionary->next; /*If no match found, get ready
                                              to point to the next element
                                              in the dictionary list */
-            //found=0;
+            //found = 0;
         }
 
     }
-    if (found==1){ //When a word is found matching in the dictionary,return the index
+    if (found == 1) { //When a word is found matching in the dictionary, return the index
         return iIndex;
     }
     else {
@@ -110,27 +110,27 @@ int AddWords( char *text)
 {
     struct doc_words* newNode;
 
-    newNode=getmem();
-    strncpy(newNode->words,text,strlen(text)+1);
-    newNode->next=head;
-    if(head == NULL){
+    newNode = getmem();
+    strncpy(newNode->words, text, strlen(text)+1);
+    newNode->next = head;
+    if (head == NULL) {
         newNode->index = 0;
     }
     else{
         newNode->index = (head->index) + 1;
     }
-    head=newNode;
+    head = newNode;
     return newNode->index;
 };
 
-int destroy_doc_words(){
+int destroy_doc_words() {
     struct doc_words* tmp;
-    while(head != NULL){
+    while (head != NULL) {
         tmp = head->next;
         free(head);
         head = tmp;
     }
-    head=NULL;
+    head = NULL;
 
     return 0;
 }
@@ -138,12 +138,12 @@ int destroy_doc_words(){
 
 %}
 %%
-[I][\(] {fprintf(yyout,"I(");}
-[H][\(] {fprintf(yyout,"H(");}
+[I][\(] {fprintf(yyout, "I(");}
+[H][\(] {fprintf(yyout, "H(");}
 [a-zA-Z][a-zA-Z0-9_']* {
 
     /*check whether yytext is not too lont:*/
-    if(strlen(yytext) >= WordLength){ /*there must be space for the \0 character*/
+    if (strlen(yytext) >= WordLength) { /*there must be space for the \0 character*/
         word_error = 4; /* this will cause itip() to quit without calling ITIP */
     }
     else{
@@ -151,17 +151,17 @@ int destroy_doc_words(){
           in table, output corresponding letter (A,B,...); if not
           insert into table, output corr. letter.
          */
-        if(head == NULL) {
-            i=-1;            /*First word; Very first word is read
+        if (head == NULL) {
+            i = -1;            /*First word; Very first word is read
                                and add to the dictionary*/
         }
         else{
             i = FindWords(yytext);  /*Pass the index of the matched word in
                                       the dictionary*/
         }
-        if(i == -1){
+        if (i == -1) {
             i = AddWords(yytext);   /* Add the words which are not yet present
-                                       in Dictionary (indicated by i=-1) to
+                                       in Dictionary (indicated by i = -1) to
                                        Dictionary */
         }
 
@@ -173,17 +173,17 @@ int destroy_doc_words(){
         //  can thus be used. This number is significantly higher than, the
         //  useful information expressions (atleast demanded so far). Moreover, the
         //  computing speed limits, restrict the usage of random variables, more than
-        // these (even 20 or more random variables,demand higher computing resources.
-        if(i>51){ /* If there are too many words: */
+        // these (even 20 or more random variables, demand higher computing resources.
+        if (i > 51) { /* If there are too many words: */
             word_error = 3; /* this will cause itip() to quit without calling ITIP */
         }
 
-        if(i>25){
-            fprintf(yyout,"%c",'a'+i-26);
+        if (i > 25) {
+            fprintf(yyout, "%c", 'a'+i-26);
         }
         else
         {
-            fprintf(yyout,"%c",'A'+i);
+            fprintf(yyout, "%c", 'A'+i);
         }
     }
 
@@ -204,24 +204,24 @@ int itip1(char **expressions, int num_expressions)
 
     word_error = 0;
 
-    expressions1 = (char **)malloc( (num_expressions) *sizeof(char *));
-    for(kindex=0;kindex<num_expressions;kindex++)
+    expressions1 = (char **) malloc( (num_expressions) *sizeof(char*));
+    for (kindex = 0; kindex < num_expressions; kindex++)
     {
-        expressions1[kindex] = (char *)malloc( (strlen(expressions[kindex]) + 1) * sizeof(char )); //new +1
+        expressions1[kindex] = (char*) malloc( (strlen(expressions[kindex]) + 1) * sizeof(char )); //new +1
 
     }
 
 
-    f1 = fopen("expout.txt","w");
-    for (inumber=0;inumber <num_expressions;inumber++)
+    f1 = fopen("expout.txt", "w");
+    for (inumber = 0; inumber < num_expressions; inumber++)
     {
-        fprintf(f1,"%s\n",expressions[inumber]);
+        fprintf(f1, "%s\n", expressions[inumber]);
     }
     fclose(f1);
 
 
-    yyin = fopen("expout.txt","r");
-    yyout = fopen("Output.txt","w");
+    yyin = fopen("expout.txt", "r");
+    yyout = fopen("Output.txt", "w");
 
     yylex();
 
@@ -229,17 +229,17 @@ int itip1(char **expressions, int num_expressions)
     fclose(yyout);
 
     /* if an error occurred, we do not call ITIP: */
-    if(word_error != 0){
+    if (word_error != 0) {
         destroy_doc_words();
         return word_error;
     }
 
-    f2 = fopen("Output.txt","r");
-    ii=0;
+    f2 = fopen("Output.txt", "r");
+    ii = 0;
 
     while (!feof(f2))
     {
-        fscanf(f2,"%s\n",expressions1[ii]);
+        fscanf(f2, "%s\n", expressions1[ii]);
         ii++;
     }
     fclose(f2);
@@ -247,7 +247,7 @@ int itip1(char **expressions, int num_expressions)
     unlink("Output.txt");
     unlink("expout.txt");
 
-    result = ITIP(expressions1,num_expressions);
+    result = ITIP(expressions1, num_expressions);
 
     /*free the dictionary:*/
     destroy_doc_words();

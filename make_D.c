@@ -82,7 +82,7 @@ D >= 0 AND Q >= 0
 
 void make_D(glp_prob* lp, int number_vars) /*number_constraints indicates the number of rows already present in the linear program*/
 {
-    long int index,i,j,s1,s2,mask,temp ;
+    long int index, i, j, s1, s2, mask, temp;
     int number_rows;
     int number_cols;
     int *indices;
@@ -106,13 +106,13 @@ void make_D(glp_prob* lp, int number_vars) /*number_constraints indicates the nu
 
 
     /*indices and values are buffers used to feed the current row into the LPX object:*/
-    indices = (int *)malloc(number_cols * sizeof(int));
-    values = (double *)malloc(number_cols * sizeof(double));
+    indices = (int*) malloc(number_cols * sizeof(int));
+    values = (double*) malloc(number_cols * sizeof(double));
 
-    /*row k will contain the quantity H(X1,X2,....,XN) - H(X1,X2,...,X(k-1),X(k+1),...,XN), where k=index*/
-    for(index=1;index<=number_vars;index++)
+    /*row k will contain the quantity H(X1,X2,....,XN) - H(X1,X2,...,X(k-1),X(k+1),...,XN), where k = index*/
+    for (index = 1; index <= number_vars; index++)
     {
-        s1 = (1L << (index - 1)) ; /*s1 is 2^(index-1)*/
+        s1 = (1L << (index - 1)); /*s1 is 2^(index-1)*/
 
         indices[0] = number_cols; /* H(X1,...,XN)*/ /*in GLPK, matrix-indices start at 1*/
         values[0] = -1;
@@ -131,11 +131,11 @@ void make_D(glp_prob* lp, int number_vars) /*number_constraints indicates the nu
 
 
     /* this loop is for I(X_{i+1}; X_{j+1} | X_K), where K is a subset of { {1,...,number_vars} minus {i+1, j+1}} */
-    for(i=0;i<(number_vars-1);i++){
-        for(j=i+1;j<number_vars;j++){
-            s1 = 1L << i ; /*the single variable X_k has coordinate (1L << k-1) in the joint entropy space (k = 1,...,number_vars)*/
-            s2 = 1L << j ;
-            mask = s1 | s2 ; /*this is the index of (X_(i+1),X_(j+1))*/
+    for (i = 0; i < (number_vars-1); i++) {
+        for (j = i+1; j < number_vars; j++) {
+            s1 = 1L << i; /*the single variable X_k has coordinate (1L << k-1) in the joint entropy space (k = 1,...,number_vars)*/
+            s2 = 1L << j;
+            mask = s1 | s2; /*this is the index of (X_(i+1),X_(j+1))*/
 
             /*first row ( for K = {} ):*/
             indices[0] = s1; /*H(X_(i+1))*/
@@ -157,8 +157,8 @@ void make_D(glp_prob* lp, int number_vars) /*number_constraints indicates the nu
 
 
             /*additional rows for all non-empty K:*/
-            for(temp=1;temp<=number_cols;temp++) { /* temp runs through all possible subsets of (X_1, ..., X_N)*/
-                if(!(temp & mask)) { /*if K != (i+1,j+1)*/
+            for (temp = 1; temp <= number_cols; temp++) { /* temp runs through all possible subsets of (X_1, ..., X_N)*/
+                if (!(temp & mask)) { /*if K != (i+1,j+1)*/
                     indices[0] = (s1 | temp); /* H(X_(i+1), X_K) */
                     values[0] = -1;
 
