@@ -693,30 +693,6 @@ int yyerror(char *s)
 }
 
 
-void testoutput(double **inmatrix, int *intype, int multi, int numberequations, int numbervars)
-{
-    int i, j;
-
-    puts("inmatrix:");
-    for (i = 0; i < numberequations; i++) {
-        for (j = 0; j < numbervars; j++) {
-            printf("%d\t", (int) inmatrix[i][j]);
-        }
-        printf("\n");
-    }
-
-    puts("");
-    puts("intype:");
-    for (i = 0; i < numberequations; i++) {
-        printf("%d\t", intype[i]);
-    }
-
-    puts("");
-    puts("multi:");
-    printf("%d\n", multi);
-}
-
-
 int ITIP(char **expressions, int number_expressions) {
     int temp;
     long b;
