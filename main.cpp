@@ -4,11 +4,8 @@
     Copyright (C) 2015 Thomas Gläßle <t_glaessle@gmx.de>
                        http://github.com/coldfix/Citip
 
-    Citip.cpp is the main C++ program file of the ITIP CLI frontend.
+    main.cpp is the main C++ program file of the ITIP CLI frontend.
     The file is based on the Xitip.c from the Xitip program:
-
-    Xitip.c is the main C program to produce the GTK 2+ based
-    graphical front end.
 
     Copyright (C) 2007 Rethnakaran Pulikkoonattu,
                        Etienne Perron,

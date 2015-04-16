@@ -82,7 +82,7 @@ D >= 0 AND Q >= 0
 #include <string.h>
 #include <stdio.h>
 #include <glpk.h>
-#include "elemental_inequalities.h"
+#include "Citip.h"      // add_elemental_inequalities
 
 char argnumber, status, itype, macrodetect;
 int numofinput, extrainput, multi, objcount;

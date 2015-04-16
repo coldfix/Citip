@@ -1,6 +1,6 @@
 #include <math.h>
 #include <glpk.h>
-#include "elemental_inequalities.h"
+#include "Citip.h"
 
 // Shift bits such that the given bit is free.
 int skip_bit(int pool, int bit_index)

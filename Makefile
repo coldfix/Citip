@@ -55,14 +55,14 @@ CFLAGS=
 LDFLAGS=
 
 
-OBJS= elemental_inequalities.o ITIP.o itip1.o Citip.o
+OBJS= Citip.o ITIP.o itip1.o main.o
 
 all: Citip
 
 Citip: $(OBJS)
 	g++ -o $@ $^ -lglpk
 
-Citip.o: Citip.cpp
+main.o: main.cpp
 	g++ -std=c++11 -c $<
 
 clean:
