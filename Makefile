@@ -55,7 +55,7 @@ CFLAGS=
 LDFLAGS=
 
 
-OBJS= make_D.o ITIP.o itip1.o Citip.o
+OBJS= elemental_inequalities.o ITIP.o itip1.o Citip.o
 
 all: Citip
 

@@ -67,6 +67,13 @@
  * available at https://www.gnu.org/software/glpk/
  */
 
+/*
+Note that in this ITIP software, the dimension of the optimization space
+is not reduced using the constraints. The constraints will not be set as
+D \tilde{Q} v'  >= 0 as in Yeung's "Framework" paper, but they will simply be
+D >= 0 AND Q >= 0
+*/
+
     // Modification done Rethnakaran Pulikkoonattu
     // 1-Provision to allow small English letters as random variables
     //
@@ -75,7 +82,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <glpk.h>
-#include "make_D.h"
+#include "elemental_inequalities.h"
 
 char argnumber, status, itype, macrodetect;
 int numofinput, extrainput, multi, objcount;
@@ -913,7 +920,7 @@ int ITIP(char **expressions, int number_expressions) {
     }
 
     /*add all the Shannon-type constraints:*/
-    make_D(lp, rvtotal);
+    add_elemental_inequalities(lp, rvtotal);
 
 
     /*for every objective function, we check the following:*/
