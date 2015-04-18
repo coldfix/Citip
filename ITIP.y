@@ -332,6 +332,8 @@ rvlist  : rv {field[fcount]=attribute;}
 
 rvcore  : rvlist ';' _ADDF rvlist
         | rvcore ';' _ADDF rvlist
+        | rvlist ':' _ADDF rvlist
+        | rvcore ':' _ADDF rvlist
         ;
 
 entropy : 'H' '(' rvlist ')' {condflag=0;}

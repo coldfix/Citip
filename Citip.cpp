@@ -143,11 +143,6 @@ void remove_whitespace(std::string& str)
     remove_chars(str, " \t\r\n");
 }
 
-void replace_colon(std::string& str)
-{
-    std::replace(str.begin(), str.end(), ':', ';');
-}
-
 std::string quoted(std::string str)
 {
     return '"' + str + '"';
@@ -163,7 +158,6 @@ Result callITIP (std::vector<std::string> expr)
     using namespace std;
 
     for_each(expr.begin(), expr.end(), remove_whitespace);
-    for_each(expr.begin(), expr.end(), replace_colon);
     inplace_remove_if(expr, mem_fn(&string::empty));
 
     if (expr.empty()) {
