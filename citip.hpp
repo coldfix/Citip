@@ -36,7 +36,7 @@ class ParserOutput : public ParserCallback
     void add_relation(SparseVector, bool is_inquiry);
 public:
     // consider this read-only
-    std::vector<int> var_names;
+    std::vector<std::string> var_names;
 
     Matrix inquiries;
     Matrix constraints;

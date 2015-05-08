@@ -167,16 +167,11 @@ Result callITIP (std::vector<std::string> expr)
     else
         footnote = "(without any further constraint)";
 
-    // Success
-
     if (success) {
         return Result(Result::True,
                 "The information expression ", footnote, " is TRUE.");
     }
-
-    // Not solvable
-
-    if (success) {
+    else {
         return Result(Result::Unknown,
                 "The information expression ", footnote, " is Not solvable by Xitip: This implies either of the following situations\n 1.\t The inequality is FALSE, or\n 2.\t This expression is a non-Shannon type inequality which is true.\n \t Currently Xitip is equipped enough to verify only the Shannon type inequalities");
     }

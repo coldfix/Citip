@@ -59,10 +59,10 @@ void add_elemental_inequalities(glp_prob* lp, int num_vars)
         int c = all ^ (1 << i);
         indices[1] = all;
         indices[2] = c;
-        values[1] = -1;
-        values[2] = +1;
+        values[1] = +1;
+        values[2] = -1;
         int row = glp_add_rows(lp, 1);
-        glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
+        glp_set_row_bnds(lp, row, GLP_LO, 0.0, NAN);
         glp_set_mat_row(lp, row, 2, indices, values);
     }
 
@@ -78,12 +78,12 @@ void add_elemental_inequalities(glp_prob* lp, int num_vars)
                 indices[2] = B|K;
                 indices[3] = A|B|K;
                 indices[4] = K;
-                values[1] = -1;
-                values[2] = -1;
-                values[3] = +1;
-                values[4] = +1;
+                values[1] = +1;
+                values[2] = +1;
+                values[3] = -1;
+                values[4] = -1;
                 int row = glp_add_rows(lp, 1);
-                glp_set_row_bnds(lp, row, GLP_UP, NAN, 0.0);
+                glp_set_row_bnds(lp, row, GLP_LO, 0.0, NAN);
                 glp_set_mat_row(lp, row, K ? 4 : 3, indices, values);
             }
         }
@@ -136,7 +136,10 @@ void ParserOutput::add_term(SparseVector& v, const ast::Term& t, double scale)
 
     int num_subsets = 1 << num_parts;
     int c = get_set_index(q.cond);
-    for (int set = 0; set < num_subsets; ++set) {
+    // Start at i=1 because i=0 which corresponds to H(empty set) gives no
+    // contribution to the sum. Furthermore, the i=0 is already reserved
+    // for the constant term for our purposes.
+    for (int set = 1; set < num_subsets; ++set) {
         int a = 0;
         int s = -1;
         for (int i = 0; i < num_parts; ++i) {
@@ -154,8 +157,10 @@ void ParserOutput::add_term(SparseVector& v, const ast::Term& t, double scale)
 int ParserOutput::get_var_index(const std::string& s)
 {
     int& index = vars[s];
-    if (index == 0)
-        index = vars.size() + 1;
+    if (index == 0) {
+        index = var_names.size() + 1;
+        var_names.push_back(s);
+    }
     if (index > 8*sizeof(int)) {
         throw std::runtime_error("Too many variables!");
     }
@@ -166,7 +171,7 @@ int ParserOutput::get_set_index(const ast::VarList& l)
 {
     int idx = 0;
     for (auto&& v : l)
-        idx |= get_var_index(v);
+        idx |= 1 << get_var_index(v);
     return idx;
 }
 
@@ -257,7 +262,7 @@ LinearProblem::LinearProblem(int num_cols)
     lp = glp_create_prob();
     glp_set_obj_dir(lp, GLP_MIN);
     glp_add_cols(lp, num_cols);
-    for (int i = 1; i < num_cols; ++i) {
+    for (int i = 1; i <= num_cols; ++i) {
         glp_set_col_bnds(lp, i, GLP_LO, 0, NAN);
     }
 }
@@ -270,14 +275,14 @@ LinearProblem::~LinearProblem()
 void LinearProblem::add(const SparseVector& v)
 {
     std::vector<int> indices;
-    std::vector<double> coefs;
+    std::vector<double> values;
     indices.reserve(v.entries.size());
-    coefs.reserve(v.entries.size());
+    values.reserve(v.entries.size());
     for (auto&& ent : v.entries) {
         if (ent.first == 0)
             continue;
         indices.push_back(ent.first);
-        indices.push_back(ent.second);
+        values.push_back(ent.second);
     }
 
     int kind = v.is_equality ? GLP_FX : GLP_LO;
@@ -285,7 +290,7 @@ void LinearProblem::add(const SparseVector& v)
     glp_set_row_bnds(lp, row, kind, v.get(0), NAN);
     glp_set_mat_row(
             lp, row, indices.size(),
-            indices.data()-1, coefs.data()-1);
+            indices.data()-1, values.data()-1);
 }
 
 bool LinearProblem::check(const SparseVector& v)
@@ -307,12 +312,13 @@ bool LinearProblem::check(const SparseVector& v)
 
     int num_cols = glp_get_num_cols(lp);
 
-    for (int i = 1; i < num_cols; ++i)
+    for (int i = 1; i <= num_cols; ++i)
         glp_set_obj_coef(lp, i, v.get(i));
 
     int outcome = glp_simplex(lp, &parm);
     if (outcome != 0) {
         // TODO: throw exception
+        return false;
     }
     int status = glp_get_status(lp);
 
