@@ -43,7 +43,7 @@ CFLAGS=
 LDFLAGS=
 
 
-OBJS= Citip.o ITIP.o itip1.o main.o parser.o scanner.o citip.o
+OBJS= Citip.o main.o parser.o scanner.o citip.o
 
 all: Citip
 
@@ -71,7 +71,7 @@ temp = parser.cpp parser.hpp scanner.cpp scanner.hpp \
 	   location.hh position.hh stack.hh
 
 clean:
-	rm -f ITIP.c itip.c $(OBJS) $(temp)
+	rm -f $(OBJS) $(temp)
 
 clobber: clean
 	rm -f Citip

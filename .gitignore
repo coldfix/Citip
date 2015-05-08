@@ -2,9 +2,6 @@
 Citip
 
 # Temporary files
-ITIP.c
-itip.c
-
 scanner.[ch]pp
 parser.[ch]pp
 position.hh
