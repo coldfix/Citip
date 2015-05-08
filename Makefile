@@ -37,18 +37,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-#-----------------------Makefile-----------------------
-# Just type make to produce the Citip executable. The following packages
-# are required for successfully compilation.
-# Gtk2+, (and all libs)
-# lex/flex
-# yacc/bison
-# gcc (or cc)
-# pango, glib, xpm and related libs
-# GLPK (if not included, obtain the library from GLPK webpage)
-#
-
 
 CC=gcc
 CFLAGS=
