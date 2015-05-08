@@ -43,15 +43,28 @@ CFLAGS=
 LDFLAGS=
 
 
-OBJS= Citip.o ITIP.o itip1.o main.o
+OBJS= Citip.o ITIP.o itip1.o main.o parser.o scanner.o
 
 all: Citip
 
 Citip: $(OBJS)
 	g++ -o $@ $^ -lglpk
 
-main.o: main.cpp
-	g++ -std=c++11 -c $<
+%.o: %.cpp
+	g++ $(CFLAGS) -o $@ -c $< -std=c++11
+
+parser.cpp: parser.y
+	bison $<
+
+scanner.cpp: scanner.l
+	flex $<
+
+parser.hpp:  parser.cpp
+scanner.hpp: scanner.cpp
+parser.o:    ast.hpp scanner.hpp
+scanner.o:   ast.hpp parser.hpp
+Citip.o:     ast.hpp parser.hpp scanner.hpp
+
 
 clean:
 	rm -f ITIP.c itip.c $(OBJS)

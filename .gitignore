@@ -5,6 +5,12 @@ Citip
 ITIP.c
 itip.c
 
+scanner.[ch]pp
+parser.[ch]pp
+position.hh
+location.hh
+stack.hh
+
 # The following section is taken from the file 'C++.gitignore' in
 # https://github.com/github/gitignore/blob/master/ - commit 62d6528:
 
