@@ -64,6 +64,7 @@ scanner.hpp: scanner.cpp
 parser.o:    ast.hpp scanner.hpp
 scanner.o:   ast.hpp parser.hpp
 Citip.o:     ast.hpp parser.hpp scanner.hpp
+main.o:      parser.hpp citip.hpp
 
 
 temp = parser.cpp parser.hpp scanner.cpp scanner.hpp \

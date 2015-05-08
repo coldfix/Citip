@@ -47,10 +47,7 @@
 #include <iterator>     // istream_iterator / back_inserter
 #include <functional>   // mem_fn
 
-extern "C" {
-    #include "itip1.h"
-}
-
+#include "citip.hpp"
 
 //----------------------------------------
 // Compose a string message from multiple values
@@ -162,38 +159,32 @@ Result callITIP (std::vector<std::string> expr)
                 "The information expression is EMPTY!\n You must enter a valid information expression in the first field.");
     }
 
-    int num_expr = expr.size();
-
-    vector<const char*> expr_cstr(num_expr);
-    transform(expr.begin(), expr.end(), expr_cstr.begin(),
-              mem_fn(&string::c_str));
-
-    int result = itip1(
-            const_cast<char**> (expr_cstr.data()),
-            num_expr);
+    bool success = check(parse(expr));
 
     string footnote;
-    if (num_expr > 1)
+    if (expr.size() > 1)
         footnote = "(with the given constraints)";
     else
         footnote = "(without any further constraint)";
 
     // Success
 
-    if (result == 1) {
+    if (success) {
         return Result(Result::True,
                 "The information expression ", footnote, " is TRUE.");
     }
 
     // Not solvable
 
-    if (result == 0) {
+    if (success) {
         return Result(Result::Unknown,
                 "The information expression ", footnote, " is Not solvable by Xitip: This implies either of the following situations\n 1.\t The inequality is FALSE, or\n 2.\t This expression is a non-Shannon type inequality which is true.\n \t Currently Xitip is equipped enough to verify only the Shannon type inequalities");
     }
 
     // Errors
 
+    // TEMP
+    int result = 0;
     if (result == -2) {
         return Result(Result::Error,
                 "Syntax ERROR: Re-enter the information expression\n\t",
