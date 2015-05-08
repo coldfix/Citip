@@ -15,6 +15,7 @@ struct SparseVector
     std::map<int, double> entries;
     bool is_equality;
 
+    double get(int i) const;
     void inc(int i, double v);
 };
 
@@ -44,5 +45,31 @@ public:
     void mutual_independence(ast::MutualIndependence);
     void function_of(ast::FunctionOf);
 };
+
+
+class LinearProblem
+{
+public:
+    explicit LinearProblem(int num_cols);
+    ~LinearProblem();
+
+    LinearProblem(const LinearProblem&) = delete;
+    LinearProblem& operator = (const LinearProblem&) = delete;
+
+    void add(const SparseVector&);
+    bool check(const SparseVector&);
+
+protected:
+    glp_prob* lp;
+};
+
+
+class ShannonTypeProblem
+    : public LinearProblem
+{
+public:
+    explicit ShannonTypeProblem(int num_vars);
+};
+
 
 #endif // include guard

@@ -1,6 +1,12 @@
 #include <utility>
 
+#include <glpk.h>
+
 #include "citip.hpp"
+
+extern "C" {
+    #include "Citip.h"
+}
 
 using std::move;
 
@@ -8,6 +14,14 @@ using std::move;
 //----------------------------------------
 // ParserOutput
 //----------------------------------------
+
+double SparseVector::get(int i) const
+{
+    auto&& it = entries.find(i);
+    if (it != entries.end())
+        return it->second;
+    return 0;
+}
 
 void SparseVector::inc(int i, double v)
 {
@@ -151,4 +165,89 @@ void ParserOutput::function_of(ast::FunctionOf fo)
     v.inc(func|of, 1);
     v.inc(of, -1);
     add_relation(move(v), is_inquiry);
+}
+
+
+//----------------------------------------
+// LinearProblem
+//----------------------------------------
+
+LinearProblem::LinearProblem(int num_cols)
+{
+    lp = glp_create_prob();
+    glp_set_obj_dir(lp, GLP_MIN);
+    glp_add_cols(lp, num_cols);
+    for (int i = 1; i < num_cols; ++i) {
+        glp_set_col_bnds(lp, i, GLP_LO, 0, NAN);
+    }
+}
+
+LinearProblem::~LinearProblem()
+{
+    glp_delete_prob(lp);
+}
+
+void LinearProblem::add(const SparseVector& v)
+{
+    std::vector<int> indices;
+    std::vector<double> coefs;
+    indices.reserve(v.entries.size());
+    coefs.reserve(v.entries.size());
+    for (auto&& ent : v.entries) {
+        if (ent.first == 0)
+            continue;
+        indices.push_back(ent.first);
+        indices.push_back(ent.second);
+    }
+
+    int kind = v.is_equality ? GLP_FX : GLP_LO;
+    int row = glp_add_rows(lp, 1);
+    glp_set_row_bnds(lp, row, kind, v.get(0), NAN);
+    glp_set_mat_row(
+            lp, row, indices.size(),
+            indices.data()-1, coefs.data()-1);
+}
+
+bool LinearProblem::check(const SparseVector& v)
+{
+    // check for equalities as I>=0 and -I>=0
+    if (v.is_equality) {
+        SparseVector v2(v);
+        v2.is_equality = false;
+        if (!check(v2))
+            return false;
+        for (auto&& ent : v2.entries)
+            ent.second = -ent.second;
+        return check(v2);
+    }
+
+    glp_smcp parm;
+    glp_init_smcp(&parm);
+    parm.msg_lev = GLP_MSG_ERR;
+
+    int num_cols = glp_get_num_cols(lp);
+
+    for (int i = 1; i < num_cols; ++i)
+        glp_set_obj_coef(lp, i, v.get(i));
+
+    int outcome = glp_simplex(lp, &parm);
+    if (outcome != 0) {
+        // TODO: throw exception
+    }
+    int status = glp_get_status(lp);
+
+    if (status != GLP_OPT)
+        return false;
+
+    // the original check was for the solution (primal variable values)
+    // rather than objective value, but let's do it simpler for now:
+    // (if an optimum is found, it should be zero anyway)
+    return glp_get_obj_val(lp) == 0.0;
+}
+
+
+ShannonTypeProblem::ShannonTypeProblem(int num_vars)
+    : LinearProblem((1<<num_vars) - 1)
+{
+    add_elemental_inequalities(lp, num_vars);
 }
