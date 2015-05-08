@@ -43,7 +43,7 @@ CFLAGS=
 LDFLAGS=
 
 
-OBJS= Citip.o ITIP.o itip1.o main.o parser.o scanner.o
+OBJS= Citip.o ITIP.o itip1.o main.o parser.o scanner.o citip.o
 
 all: Citip
 
