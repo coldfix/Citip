@@ -66,8 +66,11 @@ scanner.o:   ast.hpp parser.hpp
 Citip.o:     ast.hpp parser.hpp scanner.hpp
 
 
+temp = parser.cpp parser.hpp scanner.cpp scanner.hpp \
+	   location.hh position.hh stack.hh
+
 clean:
-	rm -f ITIP.c itip.c $(OBJS)
+	rm -f ITIP.c itip.c $(OBJS) $(temp)
 
 clobber: clean
 	rm -f Citip
