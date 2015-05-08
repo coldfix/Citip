@@ -40,36 +40,15 @@
 */
 
 #include <iostream>     // cin/cerr etc ...
-#include <sstream>      // ostringstream
 #include <string>       // getline
 #include <vector>       // vector
-#include <iterator>     // istream_iterator / back_inserter
+#include <iterator>     // back_inserter
 
 #include "citip.hpp"
+#include "common.hpp"
 
-//----------------------------------------
-// Compose a string message from multiple values
-//----------------------------------------
-
-void print_all(std::ostream& out)
-{
-    out << std::flush;
-}
-
-template <class H, class ...T>
-void print_all(std::ostream& out, H head, T... t)
-{
-    out << head;
-    print_all(out, t...);
-}
-
-template <class ...T>
-std::string sprint_all(T... t)
-{
-    std::ostringstream out;
-    print_all(out, t...);
-    return out.str();
-}
+using util::quoted;
+using util::line_iterator;
 
 
 //----------------------------------------
@@ -90,35 +69,10 @@ struct Result
     template<class ...T>
     Result(Status s, T... m)
         : status(s)
-        , message(sprint_all(m...))
+        , message(util::sprint_all(m...))
     {
     }
 };
-
-
-//----------------------------------------
-// Fun with iteration
-//----------------------------------------
-
-namespace detail
-{
-    class Line : public std::string
-    {
-        friend std::istream& operator>>(std::istream& in, Line& line)
-        {
-            return std::getline(in, line);
-        }
-    };
-
-}
-
-typedef std::istream_iterator<detail::Line> line_iterator;
-
-
-std::string quoted(std::string str)
-{
-    return '"' + str + '"';
-}
 
 
 //----------------------------------------
