@@ -12,6 +12,14 @@
 %code requires {
     #include "ast.hpp"
     typedef void* yyscan_t;
+
+    // results
+    struct ParserCallback {
+        virtual void relation(ast::Relation) = 0;
+        virtual void markov_chain(ast::MarkovChain) = 0;
+        virtual void mutual_independence(ast::MutualIndependence) = 0;
+        virtual void function_of(ast::FunctionOf) = 0;
+    };
 }
 
 %code {
@@ -30,7 +38,8 @@
 
 }
 
-%param  {yyscan_t scanner}
+%lex-param    {yyscan_t scanner}
+%parse-param  {yyscan_t scanner} {ParserCallback* cb}
 %locations
 %error-verbose
 %define parse.assert
@@ -45,11 +54,10 @@
 %token <int>            SIGN
                         REL
 
-%type <ast::Statement>              statement
-%type <ast::RelationData>           inform_inequ
+%type <ast::Relation>               inform_inequ
 %type <ast::VarCore>                mutual_indep
 %type <ast::VarCore>                markov_chain
-%type <ast::FunctionOfData>         determ_depen
+%type <ast::FunctionOf>             determ_depen
 %type <ast::Expression>             inform_expr
 %type <ast::Term>                   inform_term
 %type <ast::Quantity>               inform_quant
@@ -62,10 +70,12 @@
 
 %%
 
-statement    : inform_inequ     { $$.reset(new ast::Relation($1)); }
-             | mutual_indep     { $$.reset(new ast::MutualIndependence($1)); }
-             | markov_chain     { $$.reset(new ast::MarkovChain($1)); }
-             | determ_depen     { $$.reset(new ast::FunctionOf($1)); }
+    /* deliver output */
+
+statement    : inform_inequ     { cb->relation(move($1)); }
+             | mutual_indep     { cb->mutual_independence(move($1)); }
+             | markov_chain     { cb->markov_chain(move($1)); }
+             | determ_depen     { cb->function_of(move($1)); }
              ;
 
     /* statements */

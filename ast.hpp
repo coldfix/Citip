@@ -4,8 +4,6 @@
 # include <string>
 # include <vector>
 
-# include "shared_ptr.hpp"
-
 
 namespace ast
 {
@@ -48,53 +46,18 @@ namespace ast
 
     typedef std::vector<Term> Expression;
 
-    struct RelationData {
+    struct Relation {
         Expression left;
         int relation;
         Expression right;
     };
 
-    struct FunctionOfData {
+    typedef VarCore MutualIndependence;
+    typedef VarCore MarkovChain;
+
+    struct FunctionOf {
         VarList function, of;
     };
-
-
-    struct StatementBase
-    {
-        virtual ~StatementBase() {}
-        virtual void add_to_problem(Problem& lp);
-    };
-
-
-    struct Relation : StatementBase
-    {
-        RelationData data;
-
-        Relation(const RelationData& d) : data(d) {}
-    };
-
-    struct MutualIndependence : StatementBase
-    {
-        VarCore data;
-
-        explicit MutualIndependence(const VarCore& d) : data(d) {}
-    };
-
-    struct MarkovChain : StatementBase
-    {
-        VarCore data;
-
-        explicit MarkovChain(const VarCore& d) : data(d) {}
-    };
-
-    struct FunctionOf : StatementBase
-    {
-        FunctionOfData data;
-
-        FunctionOf(const FunctionOfData& d) : data(d) {}
-    };
-
-    typedef util::SharedPtr<StatementBase> Statement;
 
 }
 
