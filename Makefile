@@ -43,7 +43,7 @@ CFLAGS=
 LDFLAGS=
 
 
-OBJS= Citip.o main.o parser.o scanner.o citip.o
+OBJS= main.o parser.o scanner.o citip.o
 
 all: Citip
 
@@ -63,7 +63,7 @@ parser.hpp:  parser.cpp
 scanner.hpp: scanner.cpp
 parser.o:    ast.hpp scanner.hpp
 scanner.o:   ast.hpp parser.hpp
-Citip.o:     ast.hpp parser.hpp scanner.hpp
+citip.o:     ast.hpp parser.hpp scanner.hpp
 main.o:      parser.hpp citip.hpp
 
 
