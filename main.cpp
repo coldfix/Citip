@@ -219,6 +219,7 @@ Result callITIP (std::vector<std::string> expr)
 
 
 int main (int argc, char *argv[])
+try
 {
     using namespace std;
 
@@ -241,4 +242,15 @@ int main (int argc, char *argv[])
     cerr << r.message << endl;
 
     return r.status;
+}
+catch (std::exception& e)
+{
+    std::cerr << "ERROR: " << e.what() << std::endl;
+    return 2;
+}
+// force stack unwinding
+catch (...)
+{
+    std::cerr << "UNKNOWN ERROR - aborting." << std::endl;
+    return 3;
 }
