@@ -94,7 +94,8 @@
 
     /* deliver output */
 
-statement    : inform_inequ     { cb->relation(move($1)); }
+statement    : %empty           { /* allow empty (or pure comment) lines */ }
+             | inform_inequ     { cb->relation(move($1)); }
              | mutual_indep     { cb->mutual_independence(move($1)); }
              | markov_chain     { cb->markov_chain(move($1)); }
              | determ_depen     { cb->function_of(move($1)); }

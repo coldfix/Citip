@@ -39,13 +39,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>    // for_each, ...
 #include <iostream>     // cin/cerr etc ...
 #include <sstream>      // ostringstream
 #include <string>       // getline
 #include <vector>       // vector
 #include <iterator>     // istream_iterator / back_inserter
-#include <functional>   // mem_fn
 
 #include "citip.hpp"
 
@@ -117,26 +115,6 @@ namespace detail
 typedef std::istream_iterator<detail::Line> line_iterator;
 
 
-template <class T, class F>
-void inplace_remove_if(T& container, F condition)
-{
-    container.erase(
-            std::remove_if(container.begin(), container.end(), condition),
-            container.end());
-}
-
-void remove_chars(std::string& str, std::string chars)
-{
-    auto bad_char = [chars](char c) {
-        return chars.find(c) != std::string::npos; };
-    inplace_remove_if(str, bad_char);
-}
-
-void remove_whitespace(std::string& str)
-{
-    remove_chars(str, " \t\r\n");
-}
-
 std::string quoted(std::string str)
 {
     return '"' + str + '"';
@@ -150,9 +128,6 @@ std::string quoted(std::string str)
 Result callITIP (std::vector<std::string> expr)
 {
     using namespace std;
-
-    for_each(expr.begin(), expr.end(), remove_whitespace);
-    inplace_remove_if(expr, mem_fn(&string::empty));
 
     if (expr.empty()) {
         return Result(Result::Error,
