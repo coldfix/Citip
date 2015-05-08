@@ -1,13 +1,40 @@
  /*
- * Bison parser definition.
+    Bison parser definition.
+
+    For those who are new to flex/bison:
+
+    This file is transpiled (using 'bison parser.y') to a .cpp file that
+    implements the class yy::parser. This class has the job to analyze the
+    token stream resulting from repeated invocation of the yylex() function
+    and create an AST (abstract syntax tree) of the given string expressions.
+
+    Actually, the grammar is quite simple (in fact it is regular) and does
+    not require this level of parsing power, but using bison was a nice
+    getting-to-know exercise and makes language easier to extend and the code
+    easier to maintain (I believe).
+
+    Indeed, I'm a bit fond of the nice usage of C++11 initializer lists to
+    reduce redundancy in the AST composition code - which I hadn't seen in
+    any example so far.
  */
+
+%output  "parser.cpp"
+%defines "parser.hpp"
 
 /* C++ parser interface */
 %skeleton "lalr1.cc"
 %require  "3.0"
 
-%output  "parser.cpp"
-%defines "parser.hpp"
+/* add parser members (scanner, cb) and yylex parameters (loc, scanner) */
+%parse-param  {yyscan_t scanner} {ParserCallback* cb}
+%lex-param    {yyscan_t scanner}
+%locations
+
+/* increase usefulness of error messages */
+%define parse.error verbose
+
+/* assert correct cleanup of semantic value objects */
+%define parse.assert
 
 %code requires {
     #include "ast.hpp"
@@ -35,14 +62,7 @@
         t.push_back(move(v));
         return move(t);
     }
-
 }
-
-%lex-param    {yyscan_t scanner}
-%parse-param  {yyscan_t scanner} {ParserCallback* cb}
-%locations
-%error-verbose
-%define parse.assert
 
 %define api.value.type variant
 %define api.token.prefix {T_}

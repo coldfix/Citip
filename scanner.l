@@ -2,30 +2,18 @@
     Flex scanner (also known as lexer/lexical analyzer or tokenizer) for the
     Citip grammar. The scanner transforms a byte input stream into a stream
     of tokens.
+
+    For those who are new to flex/bison:
+
+    This file is transpiled (using 'flex scanner.l') to a .cpp source file
+    which implements a tokenizer function that returns on each call the
+    integer tag of a token and stores additional information into its output
+    parameters. The function declaration looks as follows:
+
+        int yylex(parser::semantic_type* yylval_param,  // [out]
+                  parser::location_type* yylloc_param,  // [in/out]
+                  yyscan_t yyscanner)                   // scanner object
 */
-%top {
-    #include "parser.hpp"
-
-    typedef yy::parser::semantic_type YYSTYPE;
-    typedef yy::parser::location_type YYLTYPE;
-}
-
-
-%{
-    #define YIELD_TOKEN(tok, val, type)     yylval->build<type>(val); \
-                                            return yy::parser::token::T_##tok;
-
-    #define YY_TXT                  std::string(yytext, yyleng)
-    #define YY_NUM                  std::atof(yytext)
-
-    #define INT_TOKEN(tok, val)     YIELD_TOKEN(tok, val, int)
-    #define NUM_TOKEN(tok)          YIELD_TOKEN(tok, YY_NUM, double)
-    #define STR_TOKEN(tok)          YIELD_TOKEN(tok, YY_TXT, std::string)
-    #define LITERAL                 return yytext[0];
-
-    #define YY_USER_ACTION          yylloc->columns(yyleng);
-
-%}
 
 %option     outfile="scanner.cpp"
 %option header-file="scanner.hpp"
@@ -48,8 +36,34 @@
 %option 8bit warn nodefault
 %option noyywrap
 
+ /* code that goes into the header as well as the implementation file */
+%top {
+    #include "parser.hpp"
+
+    typedef yy::parser::semantic_type YYSTYPE;
+    typedef yy::parser::location_type YYLTYPE;
+}
+
+ /* code that only goes into the implementation file */
+%{
+    // utility macros to simplify the actions
+    #define YIELD_TOKEN(tok, val, type)     yylval->build<type>(val); \
+                                            return yy::parser::token::T_##tok;
+
+    #define YY_TXT                  std::string(yytext, yyleng)
+    #define YY_NUM                  std::atof(yytext)
+
+    #define INT_TOKEN(tok, val)     YIELD_TOKEN(tok, val, int)
+    #define NUM_TOKEN(tok)          YIELD_TOKEN(tok, YY_NUM, double)
+    #define STR_TOKEN(tok)          YIELD_TOKEN(tok, YY_TXT, std::string)
+    #define LITERAL                 return yytext[0];
+
+    #define YY_USER_ACTION          yylloc->columns(yyleng);
+%}
+
 %%
 
+ /* code to be executed at every yylex() call */
 %{
     yylloc->step();
 %}
@@ -72,7 +86,6 @@ H/\(                        LITERAL
 
 #.*                         {/* eat comments */}
 [ \t]                       {/* eat whitespace */}
-
 
 \n                          yylloc->lines(1); LITERAL
 

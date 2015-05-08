@@ -1,6 +1,10 @@
 #ifndef __AST_HPP__INCLUDED__
 #define __AST_HPP__INCLUDED__
 
+// This file defines the AST (abstract syntax tree) for the Citip grammar,
+// i.e. the data structures that hold all the information from the parsed
+// input statements.
+
 # include <string>
 # include <vector>
 
