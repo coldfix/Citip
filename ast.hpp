@@ -15,8 +15,6 @@ namespace ast
 
     enum {
         REL_EQ,
-        REL_LT,
-        REL_GT,
         REL_LE,
         REL_GE
     };

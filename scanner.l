@@ -67,8 +67,6 @@ H/\(                        LITERAL
 \-                          INT_TOKEN(SIGN, ast::SIGN_MINUS)
 
 =                           INT_TOKEN(REL, ast::REL_EQ)
-\<                          INT_TOKEN(REL, ast::REL_LT)
-\>                          INT_TOKEN(REL, ast::REL_GT)
 \<=                         INT_TOKEN(REL, ast::REL_LE)
 \>=                         INT_TOKEN(REL, ast::REL_GE)
 
