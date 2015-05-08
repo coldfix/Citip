@@ -18,8 +18,8 @@
     any example so far.
  */
 
-%output  "parser.cpp"
-%defines "parser.hpp"
+%output  "parser.cxx"
+%defines "parser.hxx"
 
 /* C++ parser interface */
 %skeleton "lalr1.cc"
@@ -50,9 +50,11 @@
 }
 
 %code {
-    #include "scanner.hpp"
-    #include <iostream>
-    #include <utility>
+    #include <iostream>     // cerr, endl
+    #include <utility>      // move
+    #include <string>
+
+    #include "scanner.hxx"  // yylex
 
     using std::move;
 

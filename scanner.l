@@ -15,8 +15,8 @@
                   yyscan_t yyscanner)                   // scanner object
 */
 
-%option     outfile="scanner.cpp"
-%option header-file="scanner.hpp"
+%option     outfile="scanner.cxx"
+%option header-file="scanner.hxx"
 
  /*
     reentrant           generate reentrant (thread-safe) parser
@@ -38,7 +38,7 @@
 
  /* code that goes into the header as well as the implementation file */
 %top {
-    #include "parser.hpp"
+    #include "parser.hxx"
 
     typedef yy::parser::semantic_type YYSTYPE;
     typedef yy::parser::location_type YYLTYPE;

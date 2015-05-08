@@ -4,8 +4,8 @@
 #include <glpk.h>
 
 #include "citip.hpp"
-#include "parser.hpp"
-#include "scanner.hpp"
+#include "parser.hxx"
+#include "scanner.hxx"
 
 using std::move;
 

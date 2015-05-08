@@ -53,25 +53,24 @@ Citip: $(OBJS)
 %.o: %.cpp
 	g++ $(CFLAGS) -o $@ -c $< -std=c++11
 
-parser.cpp: parser.y
+%.o: %.cxx
+	g++ $(CFLAGS) -o $@ -c $< -std=c++11
+
+parser.cxx: parser.y
 	bison $<
 
-scanner.cpp: scanner.l
+scanner.cxx: scanner.l
 	flex $<
 
-parser.hpp:  parser.cpp
-scanner.hpp: scanner.cpp
-parser.o:    ast.hpp scanner.hpp
-scanner.o:   ast.hpp parser.hpp
-citip.o:     ast.hpp parser.hpp scanner.hpp
-main.o:      parser.hpp citip.hpp
-
-
-temp = parser.cpp parser.hpp scanner.cpp scanner.hpp \
-	   location.hh position.hh stack.hh
+parser.hxx:  parser.cxx
+scanner.hxx: scanner.cxx
+parser.o:    ast.hpp scanner.hxx
+scanner.o:   ast.hpp parser.hxx
+citip.o:     ast.hpp parser.hxx scanner.hxx
+main.o:      parser.hxx citip.hpp
 
 clean:
-	rm -f $(OBJS) $(temp)
+	rm -f *.o *.cxx *.hxx *.hh
 
 clobber: clean
 	rm -f Citip

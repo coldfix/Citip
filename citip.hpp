@@ -5,7 +5,7 @@
 # include <string>
 # include <vector>
 
-# include "parser.hpp"
+# include "parser.hxx"
 
 struct glp_prob;
 
