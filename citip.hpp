@@ -72,4 +72,9 @@ public:
 };
 
 
+ParserOutput parse(const std::vector<std::string>&);
+
+bool check(const ParserOutput&);
+
+
 #endif // include guard

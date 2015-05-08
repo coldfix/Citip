@@ -3,6 +3,8 @@
 #include <glpk.h>
 
 #include "citip.hpp"
+#include "parser.hpp"
+#include "scanner.hpp"
 
 extern "C" {
     #include "Citip.h"
@@ -250,4 +252,46 @@ ShannonTypeProblem::ShannonTypeProblem(int num_vars)
     : LinearProblem((1<<num_vars) - 1)
 {
     add_elemental_inequalities(lp, num_vars);
+}
+
+
+//----------------------------------------
+// globals
+//----------------------------------------
+
+ParserOutput parse(const std::vector<std::string>& exprs)
+{
+    ParserOutput out;
+    yyscan_t scanner;
+    try {
+        yylex_init(&scanner);
+        for (auto&& line : exprs) {
+            yy::parser parser(scanner, &out);
+            YY_BUFFER_STATE buffer = yy_scan_bytes(line.c_str(), line.size(),
+                                                   scanner);
+            int result = parser.parse();
+            if (result != 0) {
+                // TODO: throw exceptions within parser
+                throw std::runtime_error("parser_error");
+            }
+            yy_delete_buffer(buffer, scanner);
+        }
+    }
+    catch (...) {
+        yylex_destroy(scanner);
+        throw;
+    }
+    return move(out);
+}
+
+bool check(const ParserOutput& out)
+{
+    ShannonTypeProblem prob(out.var_names.size());
+    for (auto&& constraint : out.constraints)
+        prob.add(constraint);
+    for (auto&& inquiry : out.inquiries) {
+        if (!prob.check(inquiry))
+            return false;
+    }
+    return true;
 }
