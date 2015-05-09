@@ -37,7 +37,12 @@
 %define parse.assert
 
 %code requires {
+    #include <stdexcept>
+    #include <string>
+
     #include "ast.hpp"
+    #include "location.hh"
+
     typedef void* yyscan_t;
 
     // results
@@ -47,6 +52,12 @@
         virtual void mutual_independence(ast::MutualIndependence) = 0;
         virtual void function_of(ast::FunctionOf) = 0;
     };
+
+    class ParserError : public std::runtime_error
+    {
+    public:
+        ParserError(const yy::location& l, const std::string& m);
+    };
 }
 
 %code {
@@ -55,6 +66,7 @@
     #include <string>
 
     #include "scanner.hxx"  // yylex
+    #include "common.hpp"   // sprint_all
 
     using std::move;
 
@@ -158,8 +170,15 @@ var_list     : var_list ',' NAME                { $$ = enlist($1, $3); }
 
 void yy::parser::error(const parser::location_type& l, const std::string& m)
 {
-    std::cerr << m
-            << " at line " << l.begin.line
-            << " col " << l.begin.column
-            << std::endl;
+    throw ParserError(l, m);
+}
+
+ParserError::ParserError(const yy::location& location,
+                         const std::string& error_message)
+    : runtime_error(util::sprint_all(
+        error_message, " at ",
+        "line ", location.begin.line,
+        " col ", location.begin.column
+    ))
+{
 }
