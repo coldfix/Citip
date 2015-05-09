@@ -30,8 +30,11 @@ typedef std::vector<SparseVector> Matrix;
 class LinearProblem
 {
 public:
+    LinearProblem();
     explicit LinearProblem(int num_cols);
     ~LinearProblem();
+
+    void add_columns(int num_cols);
 
     LinearProblem(const LinearProblem&) = delete;
     LinearProblem& operator = (const LinearProblem&) = delete;
@@ -63,7 +66,7 @@ void add_elemental_inequalities(glp_prob* lp, int num_vars);
 class ParserOutput : public ParserCallback
 {
     int get_var_index(const std::string&);
-    int get_set_index(const ast::VarList&);
+    int get_set_index(const ast::VarList&);     // as in 'set of variables'
     void add_quant_vec(SparseVector&, const ast::Quantity&);
     void add_term(SparseVector&, const ast::Term&, double scale=1);
 

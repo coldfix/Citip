@@ -1,6 +1,7 @@
 #include <math.h>       // NAN
 #include <utility>      // move
 #include <sstream>      // istringstream
+#include <stdexcept>    // runtime_error
 
 #include <glpk.h>
 
@@ -10,6 +11,24 @@
 #include "common.hpp"
 
 using std::move;
+using util::sprint_all;
+
+
+void check_num_vars(int num_vars)
+{
+    // The index type (int) must allow to represent column numbers up to
+    // 2**num_vars. For signed int MAXINT = 2**(8*sizeof(int)-1)-1,
+    // therefore the following is the best we can do (and 30 or so random
+    // variables are probably already too much to handle anyway):
+    int max_vars = 8*sizeof(int) - 2;
+    if (num_vars > max_vars) {
+        // Note that the base class destructor ~LinearProblem will still be
+        // executed, thus freeing the allocated resource.
+        throw std::runtime_error(sprint_all(
+                    "Too many variables! At most ", max_vars,
+                    " are allowed."));
+    }
+}
 
 
 // Shift bits such that the given bit is free.
@@ -121,7 +140,14 @@ void ParserOutput::add_term(SparseVector& v, const ast::Term& t, double scale)
         return;
     }
 
-    // TODO: raise exception if num_parts too high..
+    // Need to index 2**num_parts subsets. For more detailed reasoning see
+    // the check_num_vars() function.
+    int max_parts = 8*sizeof(int) - 2;
+    if (num_parts > max_parts) {
+        throw std::runtime_error(sprint_all(
+                    "Too many parts in multivariate mutual information! ",
+                    "At most ", max_parts, " are allowed."));
+    }
 
     // Multivariate mutual information is recursively defined by
     //
@@ -158,15 +184,14 @@ void ParserOutput::add_term(SparseVector& v, const ast::Term& t, double scale)
 
 int ParserOutput::get_var_index(const std::string& s)
 {
-    int& index = vars[s];
-    if (index == 0) {
-        index = var_names.size() + 1;
-        var_names.push_back(s);
-    }
-    if (index > 8*sizeof(int)) {
-        throw std::runtime_error("Too many variables!");
-    }
-    return index - 1;
+    auto&& it = vars.find(s);
+    if (it != vars.end())
+        return it->second;
+    int next_index = var_names.size();
+    check_num_vars(next_index + 1);
+    vars[s] = next_index;
+    var_names.push_back(s);
+    return next_index;
 }
 
 int ParserOutput::get_set_index(const ast::VarList& l)
@@ -259,19 +284,29 @@ void ParserOutput::function_of(ast::FunctionOf fo)
 // LinearProblem
 //----------------------------------------
 
-LinearProblem::LinearProblem(int num_cols)
+LinearProblem::LinearProblem()
 {
     lp = glp_create_prob();
     glp_set_obj_dir(lp, GLP_MIN);
-    glp_add_cols(lp, num_cols);
-    for (int i = 1; i <= num_cols; ++i) {
-        glp_set_col_bnds(lp, i, GLP_LO, 0, NAN);
-    }
+}
+
+LinearProblem::LinearProblem(int num_cols)
+    : LinearProblem()
+{
+    add_columns(num_cols);
 }
 
 LinearProblem::~LinearProblem()
 {
     glp_delete_prob(lp);
+}
+
+void LinearProblem::add_columns(int num_cols)
+{
+    glp_add_cols(lp, num_cols);
+    for (int i = 1; i <= num_cols; ++i) {
+        glp_set_col_bnds(lp, i, GLP_LO, 0, NAN);
+    }
 }
 
 void LinearProblem::add(const SparseVector& v)
@@ -319,24 +354,35 @@ bool LinearProblem::check(const SparseVector& v)
 
     int outcome = glp_simplex(lp, &parm);
     if (outcome != 0) {
-        // TODO: throw exception
+        throw std::runtime_error(sprint_all(
+                    "Error in glp_simplex: ", outcome));
+    }
+
+    int status = glp_get_status(lp);
+    if (status == GLP_OPT) {
+        // the original check was for the solution (primal variable values)
+        // rather than objective value, but let's do it simpler for now (if
+        // an optimum is found, it should be zero anyway):
+        return glp_get_obj_val(lp) == 0.0;
+    }
+
+    if (status == GLP_UNBND) {
         return false;
     }
-    int status = glp_get_status(lp);
 
-    if (status != GLP_OPT)
-        return false;
-
-    // the original check was for the solution (primal variable values)
-    // rather than objective value, but let's do it simpler for now:
-    // (if an optimum is found, it should be zero anyway)
-    return glp_get_obj_val(lp) == 0.0;
+    // I am not sure about the exact distinction of GLP_NOFEAS, GLP_INFEAS,
+    // GLP_UNDEF, so here is a generic error message:
+    throw std::runtime_error(sprint_all(
+                "no feasible solution (status code ", status, ")"
+                ));
 }
 
 
 ShannonTypeProblem::ShannonTypeProblem(int num_vars)
-    : LinearProblem((1<<num_vars) - 1)
+    : LinearProblem()
 {
+    check_num_vars(num_vars);
+    add_columns((1<<num_vars) - 1);
     add_elemental_inequalities(lp, num_vars);
 }
 
@@ -366,7 +412,7 @@ ParserOutput parse(const std::vector<std::string>& exprs)
             // character. This is much more useful:
             int col = e.location.begin.column;
             int len = 1 + e.location.end.column - col;
-            std::string new_message = util::sprint_all(
+            std::string new_message = sprint_all(
                     e.what(), "\n",
                     "in row ", row, " col ", col, ":\n\n"
                     "    ", line, "\n",
