@@ -1,9 +1,9 @@
 # Binaries
 Citip
 
-# Temporary files
-ITIP.c
-itip.c
+# Generated source files
+*.[ch]xx
+*.hh
 
 # The following section is taken from the file 'C++.gitignore' in
 # https://github.com/github/gitignore/blob/master/ - commit 62d6528:
