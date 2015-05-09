@@ -3,28 +3,46 @@ Citip
 
 Information Theoretic Inequality Prover (C++/CLI version).
 
-This program is a fork of Xitip_ which is based on ITIP_. So far, the
-differences from Xitip are:
-
-- replace the GTK frontend by a simple CLI frontend
-- ported to the free software GLPK_ library for linear programming
-
-*Why fork?*
-
-- I found the GUI inconvenient to work with and pointless for this
-  particular application. CLI applications can be used for automated
-  purposes much more easily.
-- To provide a public platform for possible continued development of the
-  application. I was unable to get in contact with any of the original
-  authors of Xitip (emails are dead), and there is (AFAIK) no public VCS. I
-  probably won't do much on this repository on my own, but **if you have
-  any ideas and/or patches to contribute, don't be shy!** I probably won't
-  be able to answer any questions, but asking can't hurt. In any case, just
-  open an issue or send me a pull-request.
+This program is derived from Xitip_ which is based on ITIP_. Xitip was made
+by *Rethnakaran Pulikkoonattu*, *Etienne Perron* and *Suhas Diggavi*. ITIP
+was created by *Raymond W. Yeung* and *Ying-On Yan*.
 
 .. _Xitip: http://xitip.epfl.ch/
 .. _ITIP: http://user-www.ie.cuhk.edu.hk/~ITIP/
+
+
+Why another fork?
+-----------------
+
+Originally, I just wanted to replace the GTK frontend by a more convenient
+CLI interface, because I found the GUI annoying, inconvenient to work with
+and pointless for this particular application. Thinking further, CLI based
+applications are also better for automatization and require fewer run-time
+dependencies.
+
+-rant
+
+Another reason was to provide a public platform for possible continued
+development of the application. I was unable to get in contact with any of
+the original authors of Xitip (emails are dead), and there is (AFAIK) no
+public VCS. **If you have any ideas and/or patches to contribute, don't be
+shy!**, just open an issue or send me a pull-request.
+
+I didn't plan to do much apart from that. By now all the source files have
+been completely rewritten. The main differences to Xitip are:
+
+- replace the GTK frontend by a simple CLI frontend
+- ported to the free software GLPK_ library for linear programming
+- extend the accepted grammar in a few places
+- more maintainable code base
+- compilation requires a C++11 compliant compiler and recent versions of
+  flex and bison
+
+For a more detailed list of changes see CHANGES.rst_ and ultimately the
+commit history.
+
 .. _GLPK: https://www.gnu.org/software/glpk/
+.. _CHANGES.rst: https://github.com/coldfix/Citip/blob/master/CHANGES.rst
 
 
 Build
@@ -45,6 +63,9 @@ follows:
     cd Citip
     make
 
+Please report if the compilation or flex/bison source generation fails. If
+the problem is only with flex/bison, I can provide generated sources.
+
 
 Usage
 -----
@@ -60,25 +81,31 @@ inequality to be proven. All the others are constraints. Example:
 
     $ ./Citip 'I(X;Y|Z) <= I(X;Y)'
 
-    The information expression (without any further constraint) is Not solvable by Xitip: This implies either of the following situations
-     1.	 The inequality is FALSE, or
-     2.	 This expression is a non-Shannon type inequality which is true.
-     	 Currently Xitip is equipped enough to verify only the Shannon type inequalities
+    The information expression is either:
+        1. FALSE, or
+        2. a non-Shannon type inequality
 
     (exit code = 1)
 
+
     $ ./Citip 'I(X;Y|Z) <= I(X;Y)' 'H(Z) = 0'
 
-    The information expression (with the given constraints) is TRUE.
+    The information expression is TRUE.
 
     (exit code = 0)
 
+
     $ ./Citip 'I(X;;Y|Z) <= I(X;Y)'
 
-    Syntax ERROR: Re-enter the information expression
-    	"I(X;;Y|Z)<=I(X;Y)"
+    ERROR: syntax error, unexpected ';', expecting NAME
+    in row 0 col 5:
+    
+        I(X;;Y|Z) <= I(X;Y)
+            ^^
 
     (exit code = 2)
+
+Note that the location indicators for syntax errors are only approximate.
 
 The program exit code can be used to determine the outcome. The meaning of
 exit codes is as follows::
