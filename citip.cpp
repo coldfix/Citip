@@ -134,9 +134,8 @@ void ParserOutput::add_term(SparseVector& v, const ast::Term& t, double scale)
     const ast::Quantity& q = t.quantity;
     double coef = scale * t.coefficient;
     int num_parts = q.parts.size();
-    if (num_parts == 0) {
-        // constant
-        v.inc(0, -coef);
+    if (num_parts == 0) {   // constant
+        v.inc(0, coef);
         return;
     }
 
@@ -324,7 +323,7 @@ void LinearProblem::add(const SparseVector& v)
 
     int kind = v.is_equality ? GLP_FX : GLP_LO;
     int row = glp_add_rows(lp, 1);
-    glp_set_row_bnds(lp, row, kind, v.get(0), NAN);
+    glp_set_row_bnds(lp, row, kind, -v.get(0), NAN);
     glp_set_mat_row(
             lp, row, indices.size(),
             indices.data()-1, values.data()-1);
@@ -363,7 +362,7 @@ bool LinearProblem::check(const SparseVector& v)
         // the original check was for the solution (primal variable values)
         // rather than objective value, but let's do it simpler for now (if
         // an optimum is found, it should be zero anyway):
-        return glp_get_obj_val(lp) == 0.0;
+        return glp_get_obj_val(lp) >= -v.get(0);
     }
 
     if (status == GLP_UNBND) {
