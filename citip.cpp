@@ -1,11 +1,12 @@
 #include <math.h>       // NAN
 #include <utility>      // move
+#include <sstream>      // istringstream
 
 #include <glpk.h>
 
 #include "citip.hpp"
 #include "parser.hxx"
-#include "scanner.hxx"
+#include "scanner.hpp"
 
 using std::move;
 
@@ -346,30 +347,19 @@ ShannonTypeProblem::ShannonTypeProblem(int num_vars)
 ParserOutput parse(const std::vector<std::string>& exprs)
 {
     ParserOutput out;
-    yyscan_t scanner;
-    try {
-        yylex_init(&scanner);
-        for (auto&& line : exprs) {
-            yy::parser parser(scanner, &out);
-            YY_BUFFER_STATE buffer = yy_scan_bytes(line.c_str(), line.size(),
-                                                   scanner);
-            int result = parser.parse();
-            if (result != 0) {
-                // Not sure if this can even happen
-                throw std::runtime_error("Unknown parsing error");
-            }
-            yy_delete_buffer(buffer, scanner);
+    for (auto&& line : exprs) {
+        std::istringstream in(line);
+        yy::scanner scanner(&in);
+        yy::parser parser(&scanner, &out);
+        int result = parser.parse();
+        if (result != 0) {
+            // Not sure if this can even happen
+            throw std::runtime_error("Unknown parsing error");
         }
     }
-    catch (...) {
-        yylex_destroy(scanner);
-        throw;
-    }
-
     if (out.inquiries.empty()) {
         throw std::runtime_error("undefined information expression");
     }
-
     return move(out);
 }
 

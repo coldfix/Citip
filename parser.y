@@ -26,8 +26,7 @@
 %require  "3.0"
 
 /* add parser members (scanner, cb) and yylex parameters (loc, scanner) */
-%parse-param  {yyscan_t scanner} {ParserCallback* cb}
-%lex-param    {yyscan_t scanner}
+%parse-param  {yy::scanner* scanner} {ParserCallback* cb}
 %locations
 
 /* increase usefulness of error messages */
@@ -43,7 +42,9 @@
     #include "ast.hpp"
     #include "location.hh"
 
-    typedef void* yyscan_t;
+    namespace yy {
+        class scanner;
+    };
 
     // results
     struct ParserCallback {
@@ -65,10 +66,15 @@
     #include <utility>      // move
     #include <string>
 
-    #include "scanner.hxx"  // yylex
+    #include "scanner.hpp"
     #include "common.hpp"   // sprint_all
 
     using std::move;
+
+    #ifdef  yylex
+    # undef yylex
+    #endif
+    #define yylex scanner->lex
 
     template <class T, class V>
     T&& enlist(T& t, V& v)

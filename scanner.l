@@ -19,33 +19,22 @@
 %option header-file="scanner.hxx"
 
  /*
-    reentrant           generate reentrant (thread-safe) parser
-                        this adds the yyscanner argument to all functions
-    bison-bridge        add &yylval argument to yylex
-    bison-locations     add &yylloc argument to yylex
-
+    c++                 generate C++ parser class
     8bit                don't fail on 8-bit input characters
     warn                warn about inconsistencies
     nodefault           don't create default echo-all rule
     noyywrap            don't use yywrap() function
  */
-%option reentrant
-%option bison-bridge
-%option bison-locations
-
+%option c++
 %option 8bit warn nodefault
 %option noyywrap
 
- /* code that goes into the header as well as the implementation file */
-%top {
-    #include "parser.hxx"
-
-    typedef yy::parser::semantic_type YYSTYPE;
-    typedef yy::parser::location_type YYLTYPE;
-}
-
  /* code that only goes into the implementation file */
 %{
+    #include <stdexcept>
+    #include "parser.hxx"
+    #include "scanner.hpp"
+
     // utility macros to simplify the actions
     #define YIELD_TOKEN(tok, val, type)     yylval->build<type>(val); \
                                             return yy::parser::token::T_##tok;
@@ -95,3 +84,14 @@ H/\(                        LITERAL
 .                           LITERAL
 
 %%
+
+yy::scanner::scanner(std::istream* in, std::ostream* out)
+    : yyFlexLexer(in, out)
+{
+}
+
+int yyFlexLexer::yylex()
+{
+    throw std::logic_error(
+        "The yylex() exists for technical reasons and must not be used.");
+}
