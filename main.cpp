@@ -51,57 +51,6 @@ using util::quoted;
 using util::line_iterator;
 
 
-//----------------------------------------
-// Result
-//----------------------------------------
-
-struct Result
-{
-    enum Status {
-        True,
-        Unknown,
-        Error
-    };
-
-    Status status;
-    std::string message;
-
-    template<class ...T>
-    Result(Status s, T... m)
-        : status(s)
-        , message(util::sprint_all(m...))
-    {
-    }
-};
-
-
-//----------------------------------------
-// invoke ITIP
-//----------------------------------------
-
-Result callITIP (std::vector<std::string> expr)
-{
-    using namespace std;
-
-    bool success = check(parse(expr));
-
-    string footnote;
-    if (expr.size() > 1)
-        footnote = "(with the given constraints)";
-    else
-        footnote = "(without any further constraint)";
-
-    if (success) {
-        return Result(Result::True,
-                "The information expression ", footnote, " is TRUE.");
-    }
-    else {
-        return Result(Result::Unknown,
-                "The information expression ", footnote, " is Not solvable by Xitip: This implies either of the following situations\n 1.\t The inequality is FALSE, or\n 2.\t This expression is a non-Shannon type inequality which is true.\n \t Currently Xitip is equipped enough to verify only the Shannon type inequalities");
-    }
-}
-
-
 int main (int argc, char *argv[])
 try
 {
@@ -122,10 +71,17 @@ try
         copy(line_iterator(cin), line_iterator(), back_inserter(expr));
     }
 
-    Result r = callITIP(expr);
-    cerr << r.message << endl;
+    bool success = check(parse(expr));
 
-    return r.status;
+    if (success) {
+        cerr << "The information expression is TRUE." << endl;
+        return 0;
+    }
+
+    cerr << "The information expression is either:\n"
+        << "    1. FALSE, or\n"
+        << "    2. a non-Shannon type inequality" << endl;
+    return 1;
 }
 catch (std::exception& e)
 {
