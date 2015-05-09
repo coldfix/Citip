@@ -7,6 +7,7 @@
 #include "citip.hpp"
 #include "parser.hxx"
 #include "scanner.hpp"
+#include "common.hpp"
 
 using std::move;
 
@@ -347,14 +348,30 @@ ShannonTypeProblem::ShannonTypeProblem(int num_vars)
 ParserOutput parse(const std::vector<std::string>& exprs)
 {
     ParserOutput out;
-    for (auto&& line : exprs) {
+    for (int row = 0; row < exprs.size(); ++row) {
+        const std::string& line = exprs[row];
         std::istringstream in(line);
         yy::scanner scanner(&in);
         yy::parser parser(&scanner, &out);
-        int result = parser.parse();
-        if (result != 0) {
-            // Not sure if this can even happen
-            throw std::runtime_error("Unknown parsing error");
+        try {
+            int result = parser.parse();
+            if (result != 0) {
+                // Not sure if this can even happen
+                throw std::runtime_error("Unknown parsing error");
+            }
+        }
+        catch (yy::parser::syntax_error& e) {
+            // For undefined tokens, bison currently just tells us something
+            // like 'unexpected $undefined' without printing the offending
+            // character. This is much more useful:
+            int col = e.location.begin.column;
+            int len = 1 + e.location.end.column - col;
+            std::string new_message = util::sprint_all(
+                    e.what(), "\n",
+                    "in row ", row, " col ", col, ":\n\n"
+                    "    ", line, "\n",
+                    "    ", std::string(col, ' '), std::string(len, '^'));
+            throw yy::parser::syntax_error(e.location, new_message);
         }
     }
     if (out.inquiries.empty()) {
