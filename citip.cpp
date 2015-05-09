@@ -411,11 +411,13 @@ ParserOutput parse(const std::vector<std::string>& exprs)
             // character. This is much more useful:
             int col = e.location.begin.column;
             int len = 1 + e.location.end.column - col;
+            // TODO: The reported location is not entirely satisfying. Any
+            // chances for improvement?
             std::string new_message = sprint_all(
                     e.what(), "\n",
                     "in row ", row, " col ", col, ":\n\n"
                     "    ", line, "\n",
-                    "    ", std::string(col, ' '), std::string(len, '^'));
+                    "    ", std::string(col-1, ' '), std::string(len, '^'));
             throw yy::parser::syntax_error(e.location, new_message);
         }
     }
