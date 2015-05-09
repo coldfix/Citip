@@ -355,8 +355,8 @@ ParserOutput parse(const std::vector<std::string>& exprs)
                                                    scanner);
             int result = parser.parse();
             if (result != 0) {
-                // TODO: throw exceptions within parser
-                throw std::runtime_error("parser_error");
+                // Not sure if this can even happen
+                throw std::runtime_error("Unknown parsing error");
             }
             yy_delete_buffer(buffer, scanner);
         }
@@ -365,6 +365,11 @@ ParserOutput parse(const std::vector<std::string>& exprs)
         yylex_destroy(scanner);
         throw;
     }
+
+    if (out.inquiries.empty()) {
+        throw std::runtime_error("undefined information expression");
+    }
+
     return move(out);
 }
 
