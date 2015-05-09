@@ -380,6 +380,10 @@ ParserOutput parse(const std::vector<std::string>& exprs)
     return move(out);
 }
 
+
+// TODO: implement optimization as in Xitip: collapse variables that only
+// appear together
+
 bool check(const ParserOutput& out)
 {
     ShannonTypeProblem prob(out.var_names.size());
