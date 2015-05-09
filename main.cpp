@@ -83,11 +83,6 @@ Result callITIP (std::vector<std::string> expr)
 {
     using namespace std;
 
-    if (expr.empty()) {
-        return Result(Result::Error,
-                "The information expression is EMPTY!\n You must enter a valid information expression in the first field.");
-    }
-
     bool success = check(parse(expr));
 
     string footnote;
@@ -104,41 +99,6 @@ Result callITIP (std::vector<std::string> expr)
         return Result(Result::Unknown,
                 "The information expression ", footnote, " is Not solvable by Xitip: This implies either of the following situations\n 1.\t The inequality is FALSE, or\n 2.\t This expression is a non-Shannon type inequality which is true.\n \t Currently Xitip is equipped enough to verify only the Shannon type inequalities");
     }
-
-    // Errors
-
-    // TEMP
-    int result = 0;
-    if (result == -2) {
-        return Result(Result::Error,
-                "Syntax ERROR: Re-enter the information expression\n\t",
-                quoted(expr[0]));
-    }
-
-    if (result <= -3) {
-        return Result(Result::Error,
-                "Syntax ERROR: Constraint ", -result-2, " has wrong syntax.\n"
-               " Please re-enter\n\t",
-               quoted(expr[-result-2]),
-               "\n with the correct syntax");
-    }
-
-    if (result == 3) {
-        return Result(Result::Error,
-                "ERROR: The number of distinct random variables cannot be more than 52.");
-    }
-
-    if (result == 4) {
-        return Result(Result::Error,
-                "ERROR: Some of the random variables are too long. The maximal length allowed for a single random variable name is 300.");
-    }
-
-    if (result == 5) {
-        return Result(Result::Error,
-                "ERROR: The constraints cannot be inequalities.");
-    }
-
-    return Result(Result::Error, "An unexpected error has occurred.");
 }
 
 
