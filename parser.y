@@ -131,8 +131,8 @@ determ_depen : var_list ':' var_list             { $$ = {$1, $3}; }
     /* building blocks */
 
 inform_expr  : inform_expr SIGN inform_term     { $$ = enlist($1, $3.flip_sign($2)); }
-             |             SIGN inform_term     { $$ = {{$2.flip_sign($1)}}; }
-             |                  inform_term     { $$ = {{$1}}; }
+             |             SIGN inform_term     { $$ = {$2.flip_sign($1)}; }
+             |                  inform_term     { $$ = {$1}; }
              ;
 
 inform_term  : NUM inform_quant                 { $$ = {$1, $2}; }
