@@ -35,6 +35,31 @@
 /* assert correct cleanup of semantic value objects */
 %define parse.assert
 
+%define api.value.type variant
+%define api.token.prefix {T_}
+
+%token                  END     0   "end of file"
+
+%token <std::string>    NAME
+%token <double>         NUM
+%token <int>            SIGN
+                        REL
+
+%type <ast::Relation>               inform_inequ
+%type <ast::VarCore>                mutual_indep
+%type <ast::VarCore>                markov_chain
+%type <ast::FunctionOf>             determ_depen
+%type <ast::Expression>             inform_expr
+%type <ast::Term>                   inform_term
+%type <ast::Quantity>               inform_quant
+%type <ast::Quantity>               entropy
+%type <ast::Quantity>               mutual_inf
+%type <ast::VarList>                var_list
+%type <ast::VarCore>                mut_inf_core;
+
+%start statement
+
+
 %code requires {
     #include <stdexcept>
     #include <string>
@@ -76,31 +101,6 @@
         return move(t);
     }
 }
-
-%define api.value.type variant
-%define api.token.prefix {T_}
-
-%token                  END     0   "end of file"
-
-%token <std::string>    NAME
-%token <double>         NUM
-%token <int>            SIGN
-                        REL
-
-%type <ast::Relation>               inform_inequ
-%type <ast::VarCore>                mutual_indep
-%type <ast::VarCore>                markov_chain
-%type <ast::FunctionOf>             determ_depen
-%type <ast::Expression>             inform_expr
-%type <ast::Term>                   inform_term
-%type <ast::Quantity>               inform_quant
-%type <ast::Quantity>               entropy
-%type <ast::Quantity>               mutual_inf
-%type <ast::VarList>                var_list
-%type <ast::VarCore>                mut_inf_core;
-
-%start statement
-
 %%
 
     /* deliver output */
