@@ -176,9 +176,9 @@ void ParserOutput::add_term(SparseVector& v, const ast::Term& t, double scale)
             }
         }
         v.inc(a|c, s*coef);
-        if (c)
-            v.inc(c, -s*coef);
     }
+    if (c)
+        v.inc(c, 1);
 }
 
 int ParserOutput::get_var_index(const std::string& s)
