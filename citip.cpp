@@ -88,7 +88,7 @@ void add_elemental_inequalities(glp_prob* lp, int num_vars)
     }
 
     // Add all elemental conditional mutual information positivities, i.e.
-    // those of the form H(X_a:X_b|X_K)>=0 where a,b not in K
+    // those of the form I(X_a:X_b|X_K)>=0 where a,b not in K
     for (a = 0; a < num_vars-1; ++a) {
         for (b = a+1; b < num_vars; ++b) {
             int A = 1 << a;

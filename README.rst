@@ -99,7 +99,7 @@ inequality to be proven. All the others are constraints. Example:
 
     ERROR: syntax error, unexpected ';', expecting NAME
     in row 0 col 5:
-    
+
         I(X;;Y|Z) <= I(X;Y)
             ^^
 
