@@ -63,9 +63,18 @@ follows:
     cd Citip
     make
 
+If this fails, try building with cmake as follows:
+
+.. code-block::
+
+    make clean
+    mkdir build
+    cd build
+    cmake ..
+    make
+
 Please report if the compilation or flex/bison source generation fails. If
 the problem is only with flex/bison, I can provide generated sources.
-
 
 Usage
 -----
