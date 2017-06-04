@@ -8,14 +8,9 @@
     token stream resulting from repeated invocation of the yylex() function
     and create an AST (abstract syntax tree) of the given string expressions.
 
-    Actually, the grammar is quite simple (in fact it is regular) and does
-    not require this level of parsing power, but using bison was a nice
-    getting-to-know exercise and makes language easier to extend and the code
-    easier to maintain (I believe).
-
-    Indeed, I'm a bit fond of the nice usage of C++11 initializer lists to
-    reduce redundancy in the AST composition code - which I hadn't seen in
-    any example so far.
+    Although the grammar is quite simple and does not require this level of
+    parsing power, using bison was a nice getting-to-know exercise and makes
+    language easier to extend and the code easier to maintain.
  */
 
 %output  "parser.cxx"
