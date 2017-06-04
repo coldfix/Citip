@@ -17,10 +17,10 @@ Citip: $(OBJS)
 	g++ $(CFLAGS) -o $@ -c $< -std=c++11
 
 parser.cxx: parser.y
-	bison $<
+	bison -o $@ --defines=parser.hxx $<
 
 scanner.cxx: scanner.l
-	flex $<
+	flex -o $@ --header-file=scanner.hxx $<
 
 parser.hxx:  parser.cxx
 scanner.hxx: scanner.cxx

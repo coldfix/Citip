@@ -15,9 +15,6 @@
                   yyscan_t yyscanner)                   // scanner object
 */
 
-%option     outfile="scanner.cxx"
-%option header-file="scanner.hxx"
-
  /*
     c++                 generate C++ parser class
     8bit                don't fail on 8-bit input characters

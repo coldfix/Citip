@@ -13,9 +13,6 @@
     language easier to extend and the code easier to maintain.
  */
 
-%output  "parser.cxx"
-%defines "parser.hxx"
-
 /* C++ parser interface */
 %skeleton "lalr1.cc"
 %require  "3.0"
