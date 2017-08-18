@@ -20,5 +20,5 @@ add_executable(Citip
     ${CMAKE_CURRENT_BINARY_DIR}/parser.cxx
     ${CMAKE_CURRENT_BINARY_DIR}/scanner.cxx
 )
-target_compile_options(Citip PUBLIC -std=c++11)
+set_property(TARGET Citip PROPERTY CXX_STANDARD 11)
 target_link_libraries(Citip glpk)
