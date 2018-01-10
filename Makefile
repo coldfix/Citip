@@ -1,20 +1,16 @@
-CC=gcc
-CFLAGS=
-LDFLAGS=
-
-
-OBJS= main.o parser.o scanner.o citip.o
+OBJS     = main.o parser.o scanner.o citip.o
+CXXFLAGS = -std=c++11
 
 all: Citip
 
 Citip: $(OBJS)
-	g++ -o $@ $^ -lglpk
+	$(CXX) -o $@ $^ -lglpk
 
 %.o: %.cpp
-	g++ $(CFLAGS) -o $@ -c $< -std=c++11
+	$(CXX) -o $@ -c $< $(CPPFLAGS) $(CXXFLAGS)
 
 %.o: %.cxx
-	g++ $(CFLAGS) -o $@ -c $< -std=c++11
+	$(CXX) -o $@ -c $< $(CPPFLAGS) $(CXXFLAGS)
 
 parser.cxx: parser.y
 	bison -o $@ --defines=parser.hxx $<
