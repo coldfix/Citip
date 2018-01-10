@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
-find_package(BISON)
-find_package(FLEX)
-find_package(GLPK)
+find_package(BISON REQUIRED)
+find_package(FLEX REQUIRED)
+find_package(GLPK REQUIRED)
 
 BISON_TARGET (citip_parser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.cxx
               COMPILE_FLAGS --defines=${CMAKE_CURRENT_BINARY_DIR}/parser.hxx)
