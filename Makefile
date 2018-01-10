@@ -1,28 +1,33 @@
-OBJS     = main.o parser.o scanner.o citip.o
+BUILDDIR = build
+OBJS     = $(addprefix $(BUILDDIR)/,main.o parser.o scanner.o citip.o)
 CPPFLAGS = -MMD -MP
-CXXFLAGS = -std=c++11
+CXXFLAGS = -std=c++11 -I. -I$(BUILDDIR)
 
-all: Citip
+all: prepare Citip
 
 Citip: $(OBJS)
 	g++ -o $@ $^ -lglpk
 
-%.o: %.cpp
+$(BUILDDIR)/%.o: %.cpp
 	$(CXX) -o $@ -c $< $(CPPFLAGS) $(CXXFLAGS)
 
-%.o: %.cxx
+$(BUILDDIR)/%.o: $(BUILDDIR)/%.cxx
 	$(CXX) -o $@ -c $< $(CPPFLAGS) $(CXXFLAGS)
 
-parser.cxx: parser.y
-	bison -o $@ --defines=parser.hxx $<
+$(BUILDDIR)/parser.cxx: parser.y
+	bison -o $@ --defines=$(BUILDDIR)/parser.hxx $<
 
-scanner.cxx: scanner.l
-	flex -o $@ --header-file=scanner.hxx $<
+$(BUILDDIR)/scanner.cxx: scanner.l
+	flex  -o $@ --header-file=$(BUILDDIR)/scanner.hxx $<
 
-$(OBJS): scanner.cxx parser.cxx
+$(OBJS): $(BUILDDIR)/scanner.cxx $(BUILDDIR)/parser.cxx
+
+.PHONY: prepare all
+prepare:
+	@mkdir -p $(BUILDDIR)
 
 clean:
-	rm -f *.o *.cxx *.hxx *.hh *.d
+	rm -rf $(BUILDDIR)
 
 clobber: clean
 	rm -f Citip
