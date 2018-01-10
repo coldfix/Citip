@@ -1,10 +1,11 @@
 OBJS     = main.o parser.o scanner.o citip.o
+CPPFLAGS = -MMD -MP
 CXXFLAGS = -std=c++11
 
 all: Citip
 
 Citip: $(OBJS)
-	$(CXX) -o $@ $^ -lglpk
+	g++ -o $@ $^ -lglpk
 
 %.o: %.cpp
 	$(CXX) -o $@ -c $< $(CPPFLAGS) $(CXXFLAGS)
@@ -18,15 +19,12 @@ parser.cxx: parser.y
 scanner.cxx: scanner.l
 	flex -o $@ --header-file=scanner.hxx $<
 
-parser.hxx:  parser.cxx
-scanner.hxx: scanner.cxx
-parser.o:    ast.hpp scanner.hxx
-scanner.o:   ast.hpp parser.hxx
-citip.o:     ast.hpp parser.hxx scanner.hxx
-main.o:      parser.hxx citip.hpp
+$(OBJS): scanner.cxx parser.cxx
 
 clean:
-	rm -f *.o *.cxx *.hxx *.hh
+	rm -f *.o *.cxx *.hxx *.hh *.d
 
 clobber: clean
 	rm -f Citip
+
+-include $(OBJS:%.o=%.d)
