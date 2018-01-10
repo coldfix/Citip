@@ -1,36 +1,35 @@
-CC=gcc
-CFLAGS=
-LDFLAGS=
+BUILDDIR = build
+OBJS     = $(addprefix $(BUILDDIR)/,main.o parser.o scanner.o citip.o)
+CPPFLAGS = -MMD -MP
+CXXFLAGS = -std=c++11 -I. -I$(BUILDDIR)
 
-
-OBJS= main.o parser.o scanner.o citip.o
-
-all: Citip
+all: prepare Citip
 
 Citip: $(OBJS)
 	g++ -o $@ $^ -lglpk
 
-%.o: %.cpp
-	g++ $(CFLAGS) -o $@ -c $< -std=c++11
+$(BUILDDIR)/%.o: %.cpp
+	$(CXX) -o $@ -c $< $(CPPFLAGS) $(CXXFLAGS)
 
-%.o: %.cxx
-	g++ $(CFLAGS) -o $@ -c $< -std=c++11
+$(BUILDDIR)/%.o: $(BUILDDIR)/%.cxx
+	$(CXX) -o $@ -c $< $(CPPFLAGS) $(CXXFLAGS)
 
-parser.cxx: parser.y
-	bison -o $@ --defines=parser.hxx $<
+$(BUILDDIR)/parser.cxx: parser.y
+	bison -o $@ --defines=$(BUILDDIR)/parser.hxx $<
 
-scanner.cxx: scanner.l
-	flex -o $@ --header-file=scanner.hxx $<
+$(BUILDDIR)/scanner.cxx: scanner.l
+	flex  -o $@ --header-file=$(BUILDDIR)/scanner.hxx $<
 
-parser.hxx:  parser.cxx
-scanner.hxx: scanner.cxx
-parser.o:    ast.hpp scanner.hxx
-scanner.o:   ast.hpp parser.hxx
-citip.o:     ast.hpp parser.hxx scanner.hxx
-main.o:      parser.hxx citip.hpp
+$(OBJS): $(BUILDDIR)/scanner.cxx $(BUILDDIR)/parser.cxx
+
+.PHONY: prepare all
+prepare:
+	@mkdir -p $(BUILDDIR)
 
 clean:
-	rm -f *.o *.cxx *.hxx *.hh
+	rm -rf $(BUILDDIR)
 
 clobber: clean
 	rm -f Citip
+
+-include $(OBJS:%.o=%.d)
