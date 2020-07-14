@@ -155,6 +155,10 @@ void ParserOutput::add_term(SparseVector& v, const ast::Term& t, double scale)
     // Here, it is calculated as the alternating sum of (conditional)
     // entropies of all subsets of the parts [Jakulin & Bratko (2003)].
     //
+    //      I(X₁:…:Xₙ|Y) = - Σ (-1)^|T| H(T|Y)
+    //
+    // where the sum is over all T ⊆ {X₁, …, Xₙ}.
+    //
     // See: http://en.wikipedia.org/wiki/Multivariate_mutual_information
 
     std::vector<int> set_indices(num_parts);
