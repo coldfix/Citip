@@ -15,31 +15,28 @@ Why another fork?
 -----------------
 
 Originally, I just wanted to replace the GTK frontend by a more convenient
-CLI interface, because I found the GUI annoying, inconvenient to work with
-and pointless for this particular application. Thinking further, CLI based
-applications are also better for automatization and require fewer run-time
-dependencies.
-
--rant
+CLI interface, because I found the GUI inconvenient. CLI based applications
+are better for automatization and also require fewer run-time dependencies.
 
 Another reason was to provide a public platform for possible continued
-development of the application. I was unable to get in contact with any of
-the original authors of Xitip (emails are dead), and there is (AFAIK) no
-public VCS. **If you have any ideas and/or patches to contribute, don't be
-shy!**, just open an issue or send me a pull-request.
+development of the application. I was at the time unable to get in contact
+with any of the original authors of Xitip (emails were dead), and there was
+(AFAIK) no public VCS.
 
-I didn't plan to do much apart from that. By now all the source files have
+I didn't plan to do much apart from that, but by now all the source files have
 been completely rewritten. The main differences to Xitip are:
 
 - replace the GTK frontend by a simple CLI frontend
 - ported to the free software GLPK_ library for linear programming
 - extend the accepted grammar in a few places
-- more maintainable code base
 - compilation requires a C++11 compliant compiler and recent versions of
   flex and bison
 
 For a more detailed list of changes see CHANGES.rst_ and ultimately the
 commit history.
+
+**If you have any ideas and/or patches to contribute, don't be shy!**, just
+open an issue or send me a pull-request.
 
 .. _GLPK: https://www.gnu.org/software/glpk/
 .. _CHANGES.rst: https://github.com/coldfix/Citip/blob/master/CHANGES.rst
